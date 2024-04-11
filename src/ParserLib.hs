@@ -23,6 +23,7 @@ module ParserLib
     , parseInt
     , parseTuple
     , parseTruple
+    , removePadding
     , Parser(..)
     , (>>=)
     , (<$>)
@@ -277,3 +278,10 @@ parseTruple parser1 = Parser $ \str -> do
     (result6, rest6) <- runParser parser1 rest5
     (_, rest7) <- runParser (parseChar ')') rest6
     return ((result2, result4, result6), rest7)
+
+{- | removePadding function
+    Remove padding from a string
+-}
+removePadding :: Parser String
+removePadding = Parser $ \str ->
+    runParser (parseMany (parseAnyChar " \t\r\n")) str
