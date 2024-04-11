@@ -40,3 +40,11 @@ parseAnyChar c = Parser $ \str ->
             | x `elem` c -> Just (x, xs)
             | otherwise -> Nothing
         _ -> Nothing
+
+parseExceptChar :: Char -> Parser Char
+parseExceptChar c = Parser $ \str ->
+  case str of
+    (x:xs)
+        | x == c -> Nothing
+        | otherwise -> Just (x, xs)
+    _ -> Nothing
