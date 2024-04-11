@@ -8,7 +8,7 @@
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
 {-# HLINT ignore "Use lambda-case" #-}
 
-module Lib
+module ParserLib
     ( parseChar
     , parseTryChar
     , parseAnyChar
@@ -59,7 +59,7 @@ parseExceptChar c = Parser $ \str ->
         | otherwise -> Just (x, xs)
     _ -> Nothing
 
-parseOr :: Eq a => Parser a -> Parser a -> Parser a
+parseOr :: Parser a -> Parser a -> Parser a
 parseOr parser1 parser2 = Parser $ \string ->
     case runParser parser1 string of
         Just (result, rest) -> Just (result, rest)
@@ -98,28 +98,28 @@ parseUInt = Parser $ \str -> do
 
 parseInt :: Parser Int
 parseInt = Parser $ \str -> do
-    (neg, rest) <- runParser (parseMany ( parseChar '-')) str
-    (str, rest) <- runParser (parseSome (parseAnyChar ['0'..'9'])) rest
-    return (read (neg ++ str), rest)
+    (neg, rest1) <- runParser (parseMany ( parseChar '-')) str
+    (result, rest2) <- runParser (parseSome (parseAnyChar ['0'..'9'])) rest1
+    return (read (neg ++ result), rest2)
 
 parseTuple :: Parser a -> Parser (a, a)
 parseTuple parser1 = Parser $ \str ->
     case str of
         ('(':string) -> do
             (result1, rest1) <- runParser parser1 string
-            (result2, rest2) <- runParser (parseChar ',') rest1
+            (_, rest2) <- runParser (parseChar ',') rest1
             (result3, rest3) <- runParser parser1 rest2
-            (result4, rest4) <- runParser (parseChar ')') rest3
+            (_, rest4) <- runParser (parseChar ')') rest3
             return ((result1, result3), rest4)
         _ -> Nothing
 
 parseTruple :: Parser a -> Parser (a, a, a)
 parseTruple parser1 = Parser $ \str -> do
-    (result1, rest1) <- runParser (parseChar '(') str
+    (_, rest1) <- runParser (parseChar '(') str
     (result2, rest2) <- runParser parser1 rest1
-    (result3, rest3) <- runParser (parseChar ',') rest2
+    (_, rest3) <- runParser (parseChar ',') rest2
     (result4, rest4) <- runParser parser1 rest3
-    (result5, rest5) <- runParser (parseChar ',') rest4
+    (_, rest5) <- runParser (parseChar ',') rest4
     (result6, rest6) <- runParser parser1 rest5
-    (result7, rest7) <- runParser (parseChar ')') rest6
+    (_, rest7) <- runParser (parseChar ')') rest6
     return ((result2, result4, result6), rest7)

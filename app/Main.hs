@@ -7,7 +7,7 @@
 
 module Main(main) where
 
-import Lib
+import ParserLib
 
 main :: IO ()
 main = print (runParser (parseChar 't') "test")
