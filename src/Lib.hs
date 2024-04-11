@@ -15,6 +15,7 @@ module Lib
     , parseExceptChar
     , parseOr
     , parseAnd
+    , parseAndWith
     , Parser(..)
 ) where
 
@@ -63,3 +64,9 @@ parseAnd parser1 parser2 = Parser $ \str -> do
     (result1, rest1) <- runParser parser1 str
     (result2, rest2) <- runParser parser2 rest1
     return ((result1, result2), rest2)
+
+parseAndWith :: ( a -> b -> c ) -> Parser a -> Parser b -> Parser c
+parseAndWith f parser1 parser2  = Parser $ \str -> do
+    (result1, rest1) <- runParser parser1 str
+    (result2, rest2) <- runParser parser2 rest1
+    return (f result1 result2, rest2)
