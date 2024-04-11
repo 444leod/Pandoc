@@ -12,6 +12,7 @@ module Lib
     ( parseChar
     , parseTryChar
     , parseAnyChar
+    , parseExceptChar
     , Parser(..)
 ) where
 
