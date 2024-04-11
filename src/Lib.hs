@@ -70,3 +70,11 @@ parseAndWith f parser1 parser2  = Parser $ \str -> do
     (result1, rest1) <- runParser parser1 str
     (result2, rest2) <- runParser parser2 rest1
     return (f result1 result2, rest2)
+
+parseMany :: Parser a -> Parser [a]
+parseMany parser1 = Parser $ \str ->
+    case runParser parser1 str of
+        Just (result1, rest1) -> do
+            (result2, rest2) <- runParser (parseMany parser1) rest1
+            return (result1 : result2, rest2)
+        Nothing -> Just ([], str)
