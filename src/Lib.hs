@@ -49,3 +49,9 @@ parseExceptChar c = Parser $ \str ->
         | x == c -> Nothing
         | otherwise -> Just (x, xs)
     _ -> Nothing
+
+parseOr :: Eq a => Parser a -> Parser a -> Parser a
+parseOr parser1 parser2 = Parser $ \string ->
+    case runParser parser1 string of
+        Just (result, rest) -> Just (result, rest)
+        Nothing -> runParser parser2 string
