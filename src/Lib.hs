@@ -16,6 +16,7 @@ module Lib
     , parseOr
     , parseAnd
     , parseAndWith
+    , parseMany
     , Parser(..)
 ) where
 
