@@ -5,26 +5,18 @@
 ## Makefile
 ##
 
-NAME = EXECUTABLE_NAME
+BINARY_PATH := $(shell stack path --local-install-root)
+EXECUTABLE = mypandoc
 
-SRC = ./src/main.c
-
-OBJ = $(SRC:.asm=.o)
-
-CC = gcc
-
-CFLAGS = -Wall -Wextra -Werror -Wpedantic
-
-all: $(NAME)
-
-$(NAME): $(OBJ)
-	$(CC) -o $(NAME) $(OBJ) $(CFLAGS)
+all:
+	stack build
+	cp $(BINARY_PATH)/bin/$(EXECUTABLE)-exe ./$(EXECUTABLE)
 
 clean:
-	rm -f $(OBJ)
+	stack clean
 
 fclean: clean
-	rm -f $(NAME)
+	rm -f $(EXECUTABLE)
 
 re: fclean all
 
