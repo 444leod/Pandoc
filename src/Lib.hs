@@ -10,6 +10,7 @@
 
 module Lib
     ( parseChar
+    , parseTryChar
     , Parser(..)
 ) where
 
@@ -22,3 +23,11 @@ parseChar c = Parser $ \str ->
         | x == c -> Just (c, xs)
         | otherwise -> Nothing
     _ -> Nothing
+
+parseTryChar :: Char -> Parser String
+parseTryChar c = Parser $ \str ->
+  case str of
+    (x:xs)
+        | x == c -> Just ([c], xs)
+        | otherwise -> Just ("", x:xs)
+    _ -> Just ("", str)
