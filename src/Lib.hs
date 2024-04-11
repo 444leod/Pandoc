@@ -20,6 +20,8 @@ module Lib
     , parseSome
     , parseUInt
     , parseInt
+    , parseTuple
+    , parseTruple
     , Parser(..)
 ) where
 
@@ -99,3 +101,25 @@ parseInt = Parser $ \str -> do
     (neg, rest) <- runParser (parseMany ( parseChar '-')) str
     (str, rest) <- runParser (parseSome (parseAnyChar ['0'..'9'])) rest
     return (read (neg ++ str), rest)
+
+parseTuple :: Parser a -> Parser (a, a)
+parseTuple parser1 = Parser $ \str ->
+    case str of
+        ('(':string) -> do
+            (result1, rest1) <- runParser parser1 string
+            (result2, rest2) <- runParser (parseChar ',') rest1
+            (result3, rest3) <- runParser parser1 rest2
+            (result4, rest4) <- runParser (parseChar ')') rest3
+            return ((result1, result3), rest4)
+        _ -> Nothing
+
+parseTruple :: Parser a -> Parser (a, a, a)
+parseTruple parser1 = Parser $ \str -> do
+    (result1, rest1) <- runParser (parseChar '(') str
+    (result2, rest2) <- runParser parser1 rest1
+    (result3, rest3) <- runParser (parseChar ',') rest2
+    (result4, rest4) <- runParser parser1 rest3
+    (result5, rest5) <- runParser (parseChar ',') rest4
+    (result6, rest6) <- runParser parser1 rest5
+    (result7, rest7) <- runParser (parseChar ')') rest6
+    return ((result2, result4, result6), rest7)
