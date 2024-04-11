@@ -19,6 +19,7 @@ module Lib
     , parseMany
     , parseSome
     , parseUInt
+    , parseInt
     , Parser(..)
 ) where
 
@@ -93,3 +94,8 @@ parseUInt = Parser $ \str -> do
     (result, rest) <- runParser (parseSome (parseAnyChar ['0'..'9'])) str
     return (read result, rest)
 
+parseInt :: Parser Int
+parseInt = Parser $ \str -> do
+    (neg, rest) <- runParser (parseMany ( parseChar '-')) str
+    (str, rest) <- runParser (parseSome (parseAnyChar ['0'..'9'])) rest
+    return (read (neg ++ str), rest)
