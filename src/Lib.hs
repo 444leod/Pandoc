@@ -18,6 +18,7 @@ module Lib
     , parseAndWith
     , parseMany
     , parseSome
+    , parseUInt
     , Parser(..)
 ) where
 
@@ -86,3 +87,9 @@ parseSome parser1 = Parser $ \str -> do
     (result1, rest1) <- runParser parser1 str
     (result2, rest2) <- runParser (parseMany parser1) rest1
     return (result1 : result2, rest2)
+
+parseUInt :: Parser Int
+parseUInt = Parser $ \str -> do
+    (result, rest) <- runParser (parseSome (parseAnyChar ['0'..'9'])) str
+    return (read result, rest)
+
