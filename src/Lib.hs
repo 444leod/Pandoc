@@ -13,6 +13,8 @@ module Lib
     , parseTryChar
     , parseAnyChar
     , parseExceptChar
+    , parseOr
+    , parseAnd
     , Parser(..)
 ) where
 
@@ -55,3 +57,9 @@ parseOr parser1 parser2 = Parser $ \string ->
     case runParser parser1 string of
         Just (result, rest) -> Just (result, rest)
         Nothing -> runParser parser2 string
+
+parseAnd :: Parser a -> Parser b -> Parser (a, b)
+parseAnd parser1 parser2 = Parser $ \str -> do
+    (result1, rest1) <- runParser parser1 str
+    (result2, rest2) <- runParser parser2 rest1
+    return ((result1, result2), rest2)
