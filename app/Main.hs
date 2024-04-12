@@ -7,7 +7,8 @@
 
 module Main(main) where
 
-import ParserLib
+import JsonParser (parseJsonValue)
+import ParserLib (runParser)
 
 main :: IO ()
-main = print (runParser (parseChar 't') "test")
+main = print (runParser parseJsonValue "{\"key\": 42}")
