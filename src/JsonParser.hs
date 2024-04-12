@@ -67,9 +67,9 @@ parseNumber = Parser $ \str ->
 parseJString :: Parser JsonValue
 parseJString = Parser $ \str ->
     case str of
-        ('"':rest) -> do
-            (result, rest) <- runParser (parseSome (parseExceptChar '"')) rest
-            (result2, rest2) <- runParser (parseChar '"') rest
+        ('"':rest0) -> do
+            (result, rest1) <- runParser (parseSome (parseExceptChar '"')) rest0
+            (_, rest2) <- runParser (parseChar '"') rest1
             return (JString result, rest2)
         _ -> Nothing
 
@@ -104,7 +104,7 @@ getJArray arr = Parser $ \str ->
 parseComma :: Parser String
 parseComma = Parser $ \str ->
   case str of
-    (',':']':rest) -> Nothing
+    (',':']':_) -> Nothing
     (x:xs)
         | x == ',' -> Just (",", xs)
         | otherwise -> Just ("", x:xs)

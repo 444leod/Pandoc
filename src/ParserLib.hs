@@ -295,8 +295,8 @@ removePadding = Parser $ \str ->
 parseString :: Parser String
 parseString = Parser $ \str ->
     case str of
-        ('"':rest) -> do
-            (result, rest) <- runParser (parseSome (parseExceptChar '"')) rest
-            (result2, rest2) <- runParser (parseChar '"') rest
+        ('"':rest0) -> do
+            (result, rest1) <- runParser (parseSome (parseExceptChar '"')) rest0
+            (_, rest2) <- runParser (parseChar '"') rest1
             return (result, rest2)
         _ -> Nothing
