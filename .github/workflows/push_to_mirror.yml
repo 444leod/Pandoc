@@ -4,7 +4,8 @@ on: [push, pull_request]
 
 env:
   MIRROR_URL: ""
-  
+  EXCLUDE_FILES: 'ParserLib.hs'
+
 jobs:
   build:
     name: Test compilations
@@ -63,6 +64,12 @@ jobs:
             code=$(echo $line | cut -d":" -f4-)
             echo "::error file=$file,line=$line_number,title=$level::$code"
           done < "coding-style-reports.log"
+
+      - name: Remove undesired files from report
+        run: |
+          for file in $EXCLUDED_FILES; do
+            sed -i "/$file/d" coding-style-reports.log
+          done
 
       - name: Exit with error if there is coding style error(s)
         run: |
