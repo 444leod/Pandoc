@@ -24,6 +24,7 @@ module ParserLib
     , parseTuple
     , parseTruple
     , removePadding
+    , parseString
     , Parser(..)
     , (>>=)
     , (<$>)
@@ -286,3 +287,16 @@ parseTruple parser1 = Parser $ \str -> do
 removePadding :: Parser String
 removePadding = Parser $ \str ->
     runParser (parseMany (parseAnyChar " \t\r\n")) str
+
+{- | parseString function
+    Parse a string
+    Return a string or Nothing
+-}
+parseString :: Parser String
+parseString = Parser $ \str ->
+    case str of
+        ('"':rest0) -> do
+            (result, rest1) <- runParser (parseSome (parseExceptChar '"')) rest0
+            (_, rest2) <- runParser (parseChar '"') rest1
+            return (result, rest2)
+        _ -> Nothing
