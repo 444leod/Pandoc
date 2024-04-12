@@ -281,6 +281,7 @@ parseTruple parser1 = Parser $ \str -> do
 
 {- | removePadding function
     Remove padding from a string
+    Return the string without padding
 -}
 removePadding :: Parser String
 removePadding = Parser $ \str ->
