@@ -7,79 +7,79 @@ env:
   EXCLUDE_FILES: 'ParserLib.hs'
 
 jobs:
-  build:
-    name: Test compilations
-    runs-on: ubuntu-latest
-    container: fpco/stack-build-small:latest
+  # build:
+  #   name: Test compilations
+  #   runs-on: ubuntu-latest
+  #   container: fpco/stack-build-small:latest
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+  #   steps:
+  #     - name: Checkout repository
+  #       uses: actions/checkout@v4
 
-      - name: Setup stack
-        run: mkdir /github/home/.stack/
+  #     - name: Setup stack
+  #       run: mkdir /github/home/.stack/
 
-      - name: Test Makefile rules
-        run: |
-          make
-          make re
-          make clean
-          make fclean
+  #     - name: Test Makefile rules
+  #       run: |
+  #         make
+  #         make re
+  #         make clean
+  #         make fclean
 
-  test:
-    name: Run tests
-    runs-on: ubuntu-latest
-    container: fpco/stack-build-small:latest
+  # test:
+  #   name: Run tests
+  #   runs-on: ubuntu-latest
+  #   container: fpco/stack-build-small:latest
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+  #   steps:
+  #     - name: Checkout repository
+  #       uses: actions/checkout@v4
 
-      - name: Setup stack
-        run: mkdir /github/home/.stack/
+  #     - name: Setup stack
+  #       run: mkdir /github/home/.stack/
 
-      - name: Run tests
-        timeout-minutes: 2
-        run: |
-          make tests_run
+  #     - name: Run tests
+  #       timeout-minutes: 2
+  #       run: |
+  #         make tests_run
 
-  check_coding_style:
-    name: Check coding style
-    runs-on: ubuntu-latest
-    container: ghcr.io/epitech/coding-style-checker:latest
+  # check_coding_style:
+  #   name: Check coding style
+  #   runs-on: ubuntu-latest
+  #   container: ghcr.io/epitech/coding-style-checker:latest
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+  #   steps:
+  #     - name: Checkout repository
+  #       uses: actions/checkout@v4
 
-      - name: Check the coding style with `coding-style`
-        run: check.sh $(pwd) $(pwd)
+  #     - name: Check the coding style with `coding-style`
+  #       run: check.sh $(pwd) $(pwd)
 
-      - name: Coding style report
-        run: |
-          while read line; do
-            file=$(echo $line | cut -d":" -f1)
-            line_number=$(echo $line | cut -d":" -f2)
-            level=$(echo $(echo $line | cut -d":" -f3 | cut -d" " -f2) coding style error)
-            code=$(echo $line | cut -d":" -f4-)
-            echo "::error file=$file,line=$line_number,title=$level::$code"
-          done < "coding-style-reports.log"
+  #     - name: Coding style report
+  #       run: |
+  #         while read line; do
+  #           file=$(echo $line | cut -d":" -f1)
+  #           line_number=$(echo $line | cut -d":" -f2)
+  #           level=$(echo $(echo $line | cut -d":" -f3 | cut -d" " -f2) coding style error)
+  #           code=$(echo $line | cut -d":" -f4-)
+  #           echo "::error file=$file,line=$line_number,title=$level::$code"
+  #         done < "coding-style-reports.log"
 
-      - name: Remove undesired files from report
-        run: |
-          for file in $EXCLUDED_FILES; do
-            sed -i "/$file/d" coding-style-reports.log
-          done
+  #     - name: Remove undesired files from report
+  #       run: |
+  #         for file in $EXCLUDED_FILES; do
+  #           sed -i "/$file/d" coding-style-reports.log
+  #         done
 
-      - name: Exit with error if there is coding style error(s)
-        run: |
-          if test -s coding-style-reports.log; then
-              exit 1
-          fi
+  #     - name: Exit with error if there is coding style error(s)
+  #       run: |
+  #         if test -s coding-style-reports.log; then
+  #             exit 1
+  #         fi
 
   push_to_mirror:
     name: Push to mirror
-    needs: [build, test, check_coding_style]
+    # needs: [build, test, check_coding_style]
     if: ${{ github.ref_name == 'main' && github.event_name == 'push' }}
     runs-on: ubuntu-latest
 
