@@ -9,11 +9,11 @@ BINARY_PATH := $(shell stack path --local-install-root)
 EXECUTABLE = mypandoc
 
 all:
-	stack build
+	stack build --allow-different-user
 	cp $(BINARY_PATH)/bin/$(EXECUTABLE)-exe ./$(EXECUTABLE)
 
 clean:
-	stack clean
+	stack clean --allow-different-user
 
 fclean: clean
 	rm -f $(EXECUTABLE)

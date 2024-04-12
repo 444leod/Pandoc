@@ -7,6 +7,7 @@
 
 module Main(main) where
 
-main :: IO()
-main = putStrLn "Not yet implemented"
+import ParserLib
 
+main :: IO ()
+main = print (runParser (parseChar 't') "test")
