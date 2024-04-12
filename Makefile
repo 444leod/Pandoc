@@ -13,7 +13,7 @@ all:
 	cp $(BINARY_PATH)/bin/$(EXECUTABLE)-exe ./$(EXECUTABLE)
 
 clean:
-	stack clean
+	stack clean --allow-different-user
 
 fclean: clean
 	rm -f $(EXECUTABLE)
