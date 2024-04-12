@@ -67,8 +67,8 @@ parseNumber = Parser $ \str ->
 parseJString :: Parser JsonValue
 parseJString = Parser $ \str ->
     case str of
-        ('"':rest0) -> do
-            (result, rest1) <- runParser (parseSome (parseExceptChar '"')) rest0
+        ('"':rest) -> do
+            (result, rest1) <- runParser (parseSome (parseExceptChar '"')) rest
             (_, rest2) <- runParser (parseChar '"') rest1
             return (JString result, rest2)
         _ -> Nothing
@@ -130,7 +130,7 @@ getJObject arr = Parser $ \str -> case str of
     ('}':rest) -> Just (arr, rest)
     _ -> do (result, rest) <- runParser (removePadding *> parseString) str
             (_, rest2) <- runParser (removePadding *> parseChar ':') rest
-            (result2, rest3) <- runParser (parseMany(parseAnyChar " \t\r\n")
+            (result2, rest3) <- runParser (removePadding
                 *> parseJsonValue) rest2
             (_, rest4) <- runParser (removePadding *> parseComma) rest3
             runParser (getJObject (arr ++ [(result, result2)])) rest4
@@ -140,13 +140,14 @@ getJObject arr = Parser $ \str -> case str of
     Return a JsonValue or Nothing
 -}
 parseJsonValue :: Parser JsonValue
-parseJsonValue =
+parseJsonValue = removePadding *> (
     parseNull <|>
     parseBoolean <|>
     parseNumber <|>
     parseJString  <|>
     parseJArray <|>
     parseJObject
+    )
 
 {- | printJArray function
     Return a string representation of the array
