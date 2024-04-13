@@ -175,5 +175,5 @@ printJson (Boolean True) = "true"
 printJson (Boolean False) = "false"
 printJson (Number n) = show n
 printJson (JString str) = show str
-printJson (JArray arr) = "[" ++ printJArray arr ++ "]\n"
-printJson (JObject obj) = "{" ++ printJObject obj ++ "}\n"
+printJson (JArray arr) = "[" ++ printJArray arr ++ "]"
+printJson (JObject obj) = "{" ++ printJObject obj ++ "}"

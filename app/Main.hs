@@ -8,7 +8,7 @@
 module Main(main) where
 
 import System.Environment(getArgs)
-import JsonParser (parseJsonValue)
+import JsonParser (parseJsonValue, printJson)
 import ParserLib (runParser)
 import Config
 
@@ -18,6 +18,12 @@ main = do
     let conf = defaultConf
     let option = getOpts conf args
     validateConf option
-    -- case option of
-    --     Just opt -> launchFile (createVerifiedConf opt)
-    --     Nothing -> myError "Error: invalid arguments"
+    case option of
+        Just opt -> launchFile (createVerifiedConf opt)
+        Nothing -> myError "Error: invalid arguments"
+
+launchFile :: VerifiedConf -> IO ()
+launchFile conf = do
+    readFile (_iFile conf) >>=
+        putStrLn . maybe "Invalid Json"(printJson . fst) . runParser parseJsonValue
+    return ()

@@ -12,10 +12,10 @@ module Config(
     getOpts,
     validateConf,
     myError,
-    -- createVerifiedConf
+    createVerifiedConf
 ) where
 
-import Data.Maybe()
+import Data.Maybe(fromMaybe)
 import System.Exit(exitWith, ExitCode(ExitFailure))
 import System.IO (hPutStrLn, hPutStr, stderr)
 
@@ -98,7 +98,7 @@ getOpts conf ("-i":x:xs) = getOpts conf{iFile = Just x} xs
 getOpts conf ("-f": x:xs) = case getFormat x of
     Nothing -> Nothing
     Just format -> getOpts conf{oFormat = Just format} xs
-getOpts conf ("-o": x:xs) = getOpts conf{oFile = Just x} xs 
+getOpts conf ("-o": x:xs) = getOpts conf{oFile = Just x} xs
 getOpts conf ("-e": x:xs) = case getFormat x of
     Nothing -> Nothing
     Just format -> getOpts conf{iFormat = Just format} xs
@@ -122,14 +122,10 @@ validateConf _ = return ()
 
     Return the verified configuration
 -}
--- createVerifiedConf :: Conf -> VerifiedConf
--- createVerifiedConf (Conf (Just nbColors') (Just convergenceLimit')
---     (Just filePath') file' nbPixels') =
---     VerifiedConf {
---         _iFile = nbColors',
---         _oFormat = convergenceLimit',
---         _filePath = filePath',
---         _file = file',
---         _nbPixels = nbPixels'
---     }
--- createVerifiedConf _ = VerifiedConf 0 0.0 "" (In []) 0
+createVerifiedConf :: Conf -> VerifiedConf
+createVerifiedConf conf = VerifiedConf {
+    _iFile = fromMaybe "" (iFile conf),
+    _oFormat = fromMaybe UNKNOWNED (oFormat conf),
+    _oFile = fromMaybe "" (oFile conf),
+    _iFormat = fromMaybe UNKNOWNED (iFormat conf)
+}
