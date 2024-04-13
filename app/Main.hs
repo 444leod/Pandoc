@@ -22,6 +22,11 @@ main = do
         Just opt -> launchFile (createVerifiedConf opt)
         Nothing -> myError "Error: invalid arguments"
 
+-- TMP Function, needs rework
+{- | launchFile function
+
+    Read a file, parses it as a json, and print it as a json
+-}
 launchFile :: VerifiedConf -> IO ()
 launchFile conf = do
     readFile (_iFile conf) >>=
