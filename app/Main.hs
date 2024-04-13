@@ -17,8 +17,7 @@ main = do
     args <- getArgs
     let conf = defaultConf
     let option = getOpts conf args
-    print option
-    -- validateConf option
+    validateConf option
     -- case option of
     --     Just opt -> launchFile (createVerifiedConf opt)
     --     Nothing -> myError "Error: invalid arguments"

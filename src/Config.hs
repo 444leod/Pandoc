@@ -10,7 +10,7 @@ module Config(
     VerifiedConf(..),
     defaultConf,
     getOpts,
-    -- validateConf,
+    validateConf,
     myError,
     -- createVerifiedConf
 ) where
@@ -110,19 +110,13 @@ getOpts _ _ = Nothing
 
     Return Nothing if it is valid, Just the error message otherwise
 -}
--- validateConf :: Maybe Conf -> IO ()
--- validateConf Nothing = myError "Error:\n\tMissing arguments."
--- validateConf (Just (Conf Nothing _ _ _ _)) =
---     myError "Error:\n\tn is missing."
--- validateConf (Just (Conf _ Nothing _ _ _)) =
---     myError "Error:\n\tl is missing."
--- validateConf (Just (Conf _ _ Nothing _ _)) =
---     myError "Error:\n\tf is missing."
--- validateConf (Just (Conf (Just nbColors') _ _ _ _))
---     | nbColors' < 1 = myError "Error:\n\tn must be greater than 0."
--- validateConf (Just (Conf _ (Just convergenceLimit') _ _ _))
---     | convergenceLimit' < 0 = myError "Error:\n\tl must be greater than 0."
--- validateConf _ = return ()
+validateConf :: Maybe Conf -> IO ()
+validateConf Nothing = myError "Error:\n\tinvalid arguments.\n"
+validateConf (Just (Conf Nothing _ _ _)) =
+    myError "Error:\n\ti is missing."
+validateConf (Just (Conf _ Nothing _ _)) =
+    myError "Error:\n\tf is missing."
+validateConf _ = return ()
 
 {-  | createVerifiedConf function
 
