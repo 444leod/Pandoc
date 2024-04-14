@@ -42,17 +42,7 @@ data Document = Document {
 data Header = Header {
     _title :: String,
     _author :: Maybe String,
-    _date :: Maybe Date
-}
-
--- DOCUMENT/HEADER/DATE
-{- | Date
-    Represents a date, with a year, a day and a month
--}
-data Date = Date {
-    _year :: Int,
-    _day :: Int,
-    _month :: Int
+    _date :: Maybe String
 }
 
 -- DOCUMENT/BODY

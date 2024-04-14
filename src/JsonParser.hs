@@ -179,15 +179,28 @@ printJson (JString str) = show str
 printJson (JArray arr) = "[" ++ printJArray arr ++ "]"
 printJson (JObject obj) = "{" ++ printJObject obj ++ "}"
 
--- jsonToDocument :: JsonValue -> Maybe Document
--- jsonToDocument json = case json of
---     JObject obj -> do
---         return $ Document (getHeader obj) (getBody obj)
---     _ -> Nothing
+jsonToDocument :: JsonValue -> Maybe Document
+jsonToDocument json = case json of
+    JObject obj -> do
+        header <- getHeader (head obj)
+        body <- getBody (last obj)
+        return $ Document header body
+    _ -> Nothing
 
--- getHeader :: [(String, JsonValue)] -> Header
--- getHeader obj = Header {
---     _title = getTitle obj,
---     _author = getAuthor obj,
---     _date = getDate obj
--- }
+getHeader :: (String, JsonValue) -> Maybe Header
+getHeader ("header", JObject obj) = do
+    return $ Header  {
+        _title = "title",
+        _author = Just "author",
+        _date = Just Date {
+            _year = 2024,
+            _day = 1,
+            _month = 1
+        }
+    }
+
+getBody :: (String, JsonValue) -> Maybe Body
+getBody ("body", JArray arr) = do
+    return $ Body {
+        _content = []
+    }
