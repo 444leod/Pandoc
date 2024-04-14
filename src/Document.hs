@@ -67,9 +67,9 @@ newtype Body = Body {_content :: [Content]}
     Can either be a section, a paragraph, a list or a code block
 -}
 data Content = 
-    CSection [Section] |
-    CParagraph [Paragraph] |
-    CList [List] |
+    CSection Section |
+    CParagraph Paragraph |
+    CList List |
     CodeBlock String
 
 -- DOCUMENT/BODY/CONTENT/SECTION
