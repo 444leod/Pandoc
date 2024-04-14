@@ -12,10 +12,12 @@ module JsonParser
     ( JsonValue(..)
     , parseJsonValue
     , printJson
+    , jsonToDocument
 ) where
 
 import ParserLib
 import Document
+import Debug.Trace
 
 {- | JsonValue
     Represents a JSON value
@@ -188,19 +190,17 @@ jsonToDocument json = case json of
     _ -> Nothing
 
 getHeader :: (String, JsonValue) -> Maybe Header
-getHeader ("header", JObject obj) = do
+getHeader ("header", JObject _) = do
     return $ Header  {
         _title = "title",
         _author = Just "author",
-        _date = Just Date {
-            _year = 2024,
-            _day = 1,
-            _month = 1
-        }
+        _date = Just "2020-01-01"
     }
+getHeader _ = Nothing
 
 getBody :: (String, JsonValue) -> Maybe Body
-getBody ("body", JArray arr) = do
+getBody ("body", JArray _) = do
     return $ Body {
         _content = []
     }
+getBody _ = Nothing

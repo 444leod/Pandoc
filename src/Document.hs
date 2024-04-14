@@ -31,7 +31,7 @@ module Document
 data Document = Document {
     _header :: Header,
     _body :: Body
-}
+} deriving (Show)
 
 -- DOCUMENT/HEADER
 {- | Header
@@ -42,14 +42,14 @@ data Header = Header {
     _title :: String,
     _author :: Maybe String,
     _date :: Maybe String
-}
+} deriving (Show)
 
 -- DOCUMENT/BODY
 {- | Body
     Represents a body, with a list of content, this is where the content is 
     There is only one body per document
 -}
-newtype Body = Body {_content :: [Content]}
+newtype Body = Body {_content :: [Content]} deriving (Show)
 
 -- DOCUMENT/BODY/CONTENT
 {- | Content
@@ -59,7 +59,7 @@ data Content =
     CSection Section |
     CParagraph Paragraph |
     CList List |
-    CodeBlock String
+    CodeBlock String deriving (Show)
 
 -- DOCUMENT/BODY/CONTENT/SECTION
 {- | Section
@@ -69,14 +69,14 @@ data Content =
 data Section = Section {
     _sectionTitle :: String,
     _sectionContent :: [Content]
-}
+} deriving (Show)
 
 -- DOCUMENT/BODY/CONTENT/PARAGRAPH
 {- | Paragraph
     Represents a paragraph, with a list of paragraph content
     Assembling this list of paragraph content will give a sensable paragraph
 -}
-newtype Paragraph = Paragraph {_paragraphContent :: [ParagraphContent]}
+newtype Paragraph = Paragraph {_paragraphContent :: [ParagraphContent]} deriving (Show)
 
 -- DOCUMENT/BODY/CONTENT/PARAGRAPH/PARAGRAPHCONTENT
 {- | ParagraphContent
@@ -85,7 +85,7 @@ newtype Paragraph = Paragraph {_paragraphContent :: [ParagraphContent]}
 data ParagraphContent = 
     PText Text |
     PImage Image |
-    PLink Link
+    PLink Link deriving (Show)
 
 -- DOCUMENT/BODY/CONTENT/PARAGRAPH/PARAGRAPHCONTENT/IMAGE
 {- | Image
@@ -94,7 +94,7 @@ data ParagraphContent =
 data Image = Image {
     _imgText :: String,
     _imgURL :: String
-}
+} deriving (Show)
 
 -- DOCUMENT/BODY/CONTENT/PARAGRAPH/PARAGRAPHCONTENT/LINK
 {- | Link
@@ -103,14 +103,14 @@ data Image = Image {
 data Link = Link {
     _linkText :: String,
     _linkURL :: String
-}
+} deriving (Show)
 
 -- DOCUMENT/BODY/CONTENT/LIST
 {- | List
     Represents a list, with a list of ListContent
     (A list can contain a list)
 -}
-newtype List = List {_listContent :: [ListContent]}
+newtype List = List {_listContent :: [ListContent]} deriving (Show)
 
 -- DOCUMENT/BODY/CONTENT/LIST/LISTCONTENT
 {- | ListContent
@@ -118,7 +118,7 @@ newtype List = List {_listContent :: [ListContent]}
 -}
 data ListContent =
     ListText Text |
-    SubList List
+    SubList List deriving (Show)
 
 -- DOCUMENT/BODY/CONTENT/**/TEXT
 {- | Text
@@ -129,7 +129,7 @@ data ListContent =
 data Text = Text {
     _value :: String,
     _style :: Style
-}
+} deriving (Show)
 
 -- DOCUMENT/BODY/CONTENT/**/TEXT/STYLE
 {- | Style
@@ -140,4 +140,4 @@ data Style = Style {
     _bold :: Bool,
     _italic :: Bool,
     _code :: Bool
-}
+} deriving (Show)
