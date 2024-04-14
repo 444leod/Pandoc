@@ -295,6 +295,7 @@ removePadding = Parser $ \str ->
 parseString :: Parser String
 parseString = Parser $ \str ->
     case str of
+        ('"':'"':rest) -> return ("", rest)
         ('"':rest0) -> do
             (result, rest1) <- runParser (parseSome (parseExceptChar '"')) rest0
             (_, rest2) <- runParser (parseChar '"') rest1

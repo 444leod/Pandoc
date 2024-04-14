@@ -15,7 +15,7 @@ module JsonParser
 ) where
 
 import ParserLib
-
+import Document
 
 {- | JsonValue
     Represents a JSON value
@@ -67,6 +67,7 @@ parseNumber = Parser $ \str ->
 parseJString :: Parser JsonValue
 parseJString = Parser $ \str ->
     case str of
+        ('"':'"':rest) -> Just (JString "", rest)
         ('"':rest) -> do
             (result, rest1) <- runParser (parseSome (parseExceptChar '"')) rest
             (_, rest2) <- runParser (parseChar '"') rest1
@@ -177,3 +178,16 @@ printJson (Number n) = show n
 printJson (JString str) = show str
 printJson (JArray arr) = "[" ++ printJArray arr ++ "]"
 printJson (JObject obj) = "{" ++ printJObject obj ++ "}"
+
+-- jsonToDocument :: JsonValue -> Maybe Document
+-- jsonToDocument json = case json of
+--     JObject obj -> do
+--         return $ Document (getHeader obj) (getBody obj)
+--     _ -> Nothing
+
+-- getHeader :: [(String, JsonValue)] -> Header
+-- getHeader obj = Header {
+--     _title = getTitle obj,
+--     _author = getAuthor obj,
+--     _date = getDate obj
+-- }
