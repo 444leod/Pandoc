@@ -39,3 +39,4 @@
 mypandoc
 mypandoc.cabal
 exemple.json
+exemples/**
