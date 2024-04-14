@@ -41,8 +41,8 @@ data Document = Document {
 -}
 data Header = Header {
     _title :: String,
-    _author :: String,
-    _date :: String
+    _author :: Maybe String,
+    _date :: Maybe Date
 }
 
 -- DOCUMENT/HEADER/DATE
