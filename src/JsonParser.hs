@@ -182,12 +182,12 @@ printJson (JArray arr) = "[" ++ printJArray arr ++ "]"
 printJson (JObject obj) = "{" ++ printJObject obj ++ "}"
 
 jsonToDocument :: JsonValue -> Maybe Document
-jsonToDocument json = case json of
-    JObject obj -> do
-        header <- getHeader (head obj)
-        body <- getBody (last obj)
-        return $ Document header body
-    _ -> Nothing
+jsonToDocument (JObject (_:_:_:_)) = Nothing
+jsonToDocument (JObject obj) = do
+    header <- getHeader (head obj)
+    body <- getBody (last obj)
+    return $ Document header body
+jsonToDocument _ = Nothing
 
 getHeader :: (String, JsonValue) -> Maybe Header
 getHeader ("header", JObject obj) = do
@@ -201,14 +201,14 @@ getHeader ("header", JObject obj) = do
         _ -> Nothing
 getHeader _ = Nothing
 
-lookupOptionalString :: String -> [(String, JsonValue)] -> Maybe String
-lookupOptionalString key obj = case lookup key obj of
-    Just (JString str) -> Just str
-    _ -> Nothing
-
 getBody :: (String, JsonValue) -> Maybe Body
 getBody ("body", JArray _) = do
     return $ Body {
         _content = []
     }
 getBody _ = Nothing
+
+lookupOptionalString :: String -> [(String, JsonValue)] -> Maybe String
+lookupOptionalString key obj = case lookup key obj of
+    Just (JString str) -> Just str
+    _ -> Nothing
