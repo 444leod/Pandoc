@@ -8,7 +8,6 @@
 module Document
     ( Document(..)
     , Header(..)
-    , Date(..)
     , Body(..)
     , Content(..)
     , Section(..)
