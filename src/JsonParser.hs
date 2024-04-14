@@ -190,13 +190,21 @@ jsonToDocument json = case json of
     _ -> Nothing
 
 getHeader :: (String, JsonValue) -> Maybe Header
-getHeader ("header", JObject _) = do
-    return $ Header  {
-        _title = "title",
-        _author = Just "author",
-        _date = Just "2020-01-01"
-    }
+getHeader ("header", JObject obj) = do
+    title <- lookup "title" obj
+    case title of
+        JString title' -> Just Header {
+            _title = title',
+            _author = lookupOptionalString "author" obj,
+            _date = lookupOptionalString "date" obj
+        }
+        _ -> Nothing
 getHeader _ = Nothing
+
+lookupOptionalString :: String -> [(String, JsonValue)] -> Maybe String
+lookupOptionalString key obj = case lookup key obj of
+    Just (JString str) -> Just str
+    _ -> Nothing
 
 getBody :: (String, JsonValue) -> Maybe Body
 getBody ("body", JArray _) = do
