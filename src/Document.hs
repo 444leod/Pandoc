@@ -17,7 +17,6 @@ module Document
     , Link(..)
     , List(..)
     , ListContent(..)
-    , Text(..)
     , Format(..)
 ) where
 
@@ -84,8 +83,8 @@ newtype Paragraph = Paragraph {_paragraphContent :: [ParagraphContent]}
     Can either be a text, an image or a link
 -}
 data ParagraphContent = 
-    PText Text |
     PImage Image |
+    PTextFormat Format |
     PLink Link deriving (Show)
 
 -- DOCUMENT/BODY/CONTENT/PARAGRAPH/PARAGRAPHCONTENT/IMAGE
@@ -93,7 +92,7 @@ data ParagraphContent =
     Represents an image, with a text and an URL to the image
 -}
 data Image = Image {
-    _imgText :: String,
+    _imgText :: Format,
     _imgURL :: String
 } deriving (Show)
 
@@ -102,7 +101,7 @@ data Image = Image {
     Represents a link, with a text and an URL
 -}
 data Link = Link {
-    _linkText :: String,
+    _linkText :: Format,
     _linkURL :: String
 } deriving (Show)
 
@@ -121,23 +120,12 @@ data ListContent =
     LParagraph Paragraph |
     SubList List deriving (Show)
 
--- DOCUMENT/BODY/CONTENT/**/TEXT
-{- | Text
-    Represents a text, with a content and a format
-    A text can have a format
--}
-data Text = Text {
-    _textContent :: String,
-    _format :: Format
-} deriving (Show)
-
--- DOCUMENT/BODY/CONTENT/**/TEXT/FORMAT
+-- DOCUMENT/BODY/CONTENT/**/FORMAT
 {- | Format
-    Represents a format, with a bold, an italic and a code boolean
-    A Text can have have multiple formats at the same time
+    Represents a format, with a bold, an italic and a code Format
 -}
-data Format = Format {
-    _bold :: Bool,
-    _italic :: Bool,
-    _code :: Bool
-} deriving (Show)
+data Format =
+    Bold Format |
+    Italic Format |
+    Code Format |
+    FContent String deriving (Show)

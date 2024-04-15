@@ -232,18 +232,43 @@ getParagraph (x:xs) = do
     return $ text : rest'
 
 getParagraphContent :: JsonValue -> Maybe ParagraphContent
-getParagraphContent (JString str) = Just $ PText $ getNoFormatText str
+getParagraphContent (JString str) = Just $ PTextFormat $ FContent str
+getParagraphContent (JObject (_:_:_)) = Nothing
+getParagraphContent (JObject obj) = do
+    res <- getFormat (head obj)
+    return $ PTextFormat res
 getParagraphContent _ = Nothing
 
-getNoFormatText :: String -> Text
-getNoFormatText str = Text {
-    _textContent = str,
-    _format = Format {
-        _bold = False,
-        _italic = False,
-        _code = False
-    }
-}
+getFormat :: (String, JsonValue) -> Maybe Format
+getFormat ("bold", val) = getBold val
+getFormat ("italic", val) = getItalic val
+getFormat ("code", val) = getCode val
+getFormat _ = Nothing
+
+
+getBold :: JsonValue -> Maybe Format
+getBold (JString str) = Just $ Bold $ FContent str
+getBold (JObject (_:_:_)) = Nothing
+getBold (JObject obj) = do
+    res <- getFormat (head obj)
+    return $ Bold res
+getBold _ = Nothing
+
+getItalic :: JsonValue -> Maybe Format
+getItalic (JString str) = Just $ Italic $ FContent str
+getItalic (JObject (_:_:_)) = Nothing
+getItalic (JObject obj) = do
+    res <- getFormat (head obj)
+    return $ Italic res
+getItalic _ = Nothing
+
+getCode :: JsonValue -> Maybe Format
+getCode (JString str) = Just $ Code $ FContent str
+getCode (JObject (_:_:_)) = Nothing
+getCode (JObject obj) = do
+    res <- getFormat (head obj)
+    return $ Code res
+getCode _ = Nothing
 
 lookupOptionalString :: String -> [(String, JsonValue)] -> Maybe String
 lookupOptionalString key obj = case lookup key obj of
