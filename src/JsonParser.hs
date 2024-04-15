@@ -232,12 +232,18 @@ getParagraph (x:xs) = do
     return $ text : rest'
 
 getParagraphContent :: JsonValue -> Maybe ParagraphContent
-getParagraphContent (JString str) = Just $ PText str
-getParagraphContent (JObject obj) = case (str, rest) of
-    ("text", JString str) -> Just $ PText str
-    ("format", JString str) -> Just $ PFormat str
-    _ -> Nothing
+getParagraphContent (JString str) = Just $ PText $ getNoFormatText str
 getParagraphContent _ = Nothing
+
+getNoFormatText :: String -> Text
+getNoFormatText str = Text {
+    _textContent = str,
+    _format = Format {
+        _bold = False,
+        _italic = False,
+        _code = False
+    }
+}
 
 lookupOptionalString :: String -> [(String, JsonValue)] -> Maybe String
 lookupOptionalString key obj = case lookup key obj of

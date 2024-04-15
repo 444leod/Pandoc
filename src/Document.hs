@@ -17,6 +17,7 @@ module Document
     , Link(..)
     , List(..)
     , ListContent(..)
+    , Text(..)
     , Format(..)
 ) where
 
