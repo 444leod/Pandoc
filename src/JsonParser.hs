@@ -231,6 +231,9 @@ getContent (JObject [("list", obj)]) = do
 getContent (JObject [("link", val)]) = do
     res <- getLink val
     return $ CLink res
+getContent (JObject [("image", val)]) = do
+    res <- getImage val
+    return $ CImage res
 getContent _ = Nothing
 
 getParagraph :: [JsonValue] -> Maybe [ParagraphContent]
@@ -246,6 +249,9 @@ getParagraphContent (JObject (_:_:_)) = Nothing
 getParagraphContent (JObject [("link", val)]) = do
     res <- getLink val
     return $ PLink res
+getParagraphContent (JObject [("image", val)]) = do
+    res <- getImage val
+    return $ PImage res
 getParagraphContent (JObject obj) = do
     res <- getFormat (head obj)
     return $ PTextFormat res
@@ -318,6 +324,20 @@ getLink (JObject obj) = case lookup "content" obj of
             _ -> Nothing
     _ -> Nothing
 getLink _ = Nothing
+
+getImage :: JsonValue -> Maybe Image
+getImage (JObject (_:_:_:_)) = Nothing
+getImage (JObject obj) = case lookup "alt" obj of
+    Just(JArray arr) -> do
+        content <- getFormatList arr
+        case lookup "url" obj of
+            Just (JString url') -> Just Image {
+                _imgText = FormatList content,
+                _imgURL = url'
+            }
+            _ -> Nothing
+    _ -> Nothing
+getImage _ = Nothing
 
 getFormatList :: [JsonValue] -> Maybe [Format]
 getFormatList [] = Just []
