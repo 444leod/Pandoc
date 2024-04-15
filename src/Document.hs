@@ -17,7 +17,7 @@ module Document
     , Link(..)
     , List(..)
     , ListContent(..)
-    , Style(..)
+    , Format(..)
 ) where
 
 -- DOCUMENT
@@ -83,8 +83,7 @@ newtype Paragraph = Paragraph {_paragraphContent :: [ParagraphContent]}
     Can either be a text, an image or a link
 -}
 data ParagraphContent = 
-    PText String |
-    PFormat Format |
+    PText Text |
     PImage Image |
     PLink Link deriving (Show)
 
@@ -121,8 +120,23 @@ data ListContent =
     LParagraph Paragraph |
     SubList List deriving (Show)
 
+-- DOCUMENT/BODY/CONTENT/**/TEXT
+{- | Text
+    Represents a text, with a content and a format
+    A text can have a format
+-}
+data Text = Text {
+    _textContent :: String,
+    _format :: Format
+} deriving (Show)
+
 -- DOCUMENT/BODY/CONTENT/**/TEXT/FORMAT
 {- | Format
     Represents a format, with a bold, an italic and a code boolean
+    A Text can have have multiple formats at the same time
 -}
-data Format = BOLD | ITALIC | CODE deriving (Enum, Show)
+data Format = Format {
+    _bold :: Bool,
+    _italic :: Bool,
+    _code :: Bool
+} deriving (Show)
