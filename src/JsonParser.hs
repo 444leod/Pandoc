@@ -94,7 +94,7 @@ parseJArray = Parser $ \str ->
     Return an array of JsonValue or Nothing
 -}
 getJArray :: [JsonValue] -> Parser [JsonValue]
-getJArray arr = Parser $ \str -> 
+getJArray arr = Parser $ \str ->
     case str of
         (']':rest) -> Just (arr, rest)
         _ -> do
@@ -225,6 +225,9 @@ getContent (JArray arr) = do
 getContent (JObject [("codeblock", obj)]) = do
     codeblock <- getCodeblock obj
     return $ CCodeBlock $ CodeBlock codeblock
+getContent (JObject [("list", obj)]) = do
+    list <- trace (show obj) (getList obj)
+    return $ CList $ List list
 getContent _ = Nothing
 
 getParagraph :: [JsonValue] -> Maybe [ParagraphContent]
@@ -279,6 +282,22 @@ getCodeblock (JArray (JArray x:xs)) =  do
     rest <- getCodeblock (JArray xs)
     return $ Paragraph code : rest
 getCodeblock _ = Nothing
+
+getList :: JsonValue -> Maybe [ListContent]
+getList (JArray (JArray x:xs)) = do
+    list <- getListContent x
+    rest <- getList (JArray xs)
+    return (list : rest)
+getList (JArray(JObject [("list", obj)]:xs)) = do
+    val <- getList obj
+    return [SubList $ List val]
+getList (JArray []) = Just []
+getList _ = Nothing
+
+getListContent :: [JsonValue] -> Maybe ListContent
+getListContent arr = do
+    paragraph <- getParagraph arr
+    return $ LParagraph $ Paragraph paragraph
 
 lookupOptionalString :: String -> [(String, JsonValue)] -> Maybe String
 lookupOptionalString key obj = case lookup key obj of
