@@ -240,6 +240,9 @@ getParagraph (x:xs) = do
 getParagraphContent :: JsonValue -> Maybe ParagraphContent
 getParagraphContent (JString str) = Just $ PTextFormat $ FContent str
 getParagraphContent (JObject (_:_:_)) = Nothing
+getParagraphContent (JObject [("link", val)]) = do
+    res <- getLink val
+    return $ PLink res
 getParagraphContent (JObject obj) = do
     res <- getFormat (head obj)
     return $ PTextFormat res
@@ -288,7 +291,7 @@ getList (JArray (JArray x:xs)) = do
     list <- getListContent x
     rest <- getList (JArray xs)
     return (list : rest)
-getList (JArray(JObject [("list", obj)]:xs)) = do
+getList (JArray(JObject [("list", obj)]:_)) = do
     val <- getList obj
     return [SubList $ List val]
 getList (JArray []) = Just []
@@ -298,6 +301,32 @@ getListContent :: [JsonValue] -> Maybe ListContent
 getListContent arr = do
     paragraph <- getParagraph arr
     return $ LParagraph $ Paragraph paragraph
+
+getLink :: JsonValue -> Maybe Link
+getLink (JObject (_:_:_:_)) = Nothing
+getLink (JObject obj) = case lookup "content" obj of
+    Just(JArray arr) -> do
+        content <- getFormatList arr
+        case lookup "url" obj of
+            Just (JString url') -> Just Link {
+                _linkText = FormatList content,
+                _linkURL = url'
+            }
+            _ -> Nothing
+    _ -> Nothing
+getLink _ = Nothing
+
+getFormatList :: [JsonValue] -> Maybe [Format]
+getFormatList [] = Just []
+getFormatList (x:xs) = do
+    text <- getFormatListContent x
+    rest' <- getFormatList xs
+    return $ text : rest'
+
+getFormatListContent :: JsonValue -> Maybe Format
+getFormatListContent (JString str) = Just $ FContent str
+getFormatListContent (JObject obj) = getFormat (head obj)
+getFormatListContent _ = Nothing
 
 lookupOptionalString :: String -> [(String, JsonValue)] -> Maybe String
 lookupOptionalString key obj = case lookup key obj of

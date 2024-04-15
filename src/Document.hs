@@ -19,6 +19,7 @@ module Document
     , ListContent(..)
     , CodeBlock(..)
     , Format(..)
+    , FormatList(..)
 ) where
 
 -- DOCUMENT
@@ -92,7 +93,7 @@ data ParagraphContent =
     Represents an image, with a text and an URL to the image
 -}
 data Image = Image {
-    _imgText :: Format,
+    _imgText :: FormatList,
     _imgURL :: String
 } deriving (Show)
 
@@ -101,9 +102,11 @@ data Image = Image {
     Represents a link, with a text and an URL
 -}
 data Link = Link {
-    _linkText :: Format,
+    _linkText :: FormatList,
     _linkURL :: String
 } deriving (Show)
+
+newtype FormatList = FormatList [Format] deriving (Show)
 
 -- DOCUMENT/BODY/CONTENT/LIST
 {- | List
