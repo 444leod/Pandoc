@@ -19,6 +19,8 @@ import ParserLib
 import Document
 import Debug.Trace
 
+--- JSON PARSING FUNCTIONS ---
+
 {- | JsonValue
     Represents a JSON value
 -}
@@ -152,6 +154,8 @@ parseJsonValue = removePadding *> (
     parseJObject
     )
 
+--- JSON PRINTING FUNCTIONS ---
+
 {- | printJArray function
     Return a string representation of the array
 -}
@@ -180,6 +184,8 @@ printJson (Number n) = show n
 printJson (JString str) = show str
 printJson (JArray arr) = "[" ++ printJArray arr ++ "]"
 printJson (JObject obj) = "{" ++ printJObject obj ++ "}"
+
+--- JSON TO DOCUMENT FUNCTIONS ---
 
 jsonToDocument :: JsonValue -> Maybe Document
 jsonToDocument (JObject (_:_:_:_)) = Nothing
@@ -226,6 +232,7 @@ getParagraph (x:xs) = do
     return $ text : rest'
 
 getParagraphContent :: JsonValue -> Maybe ParagraphContent
+getParagraphContent (JString str) = Just $ PText str
 getParagraphContent (JString str) = Just $ PText str
 getParagraphContent _ = Nothing
 

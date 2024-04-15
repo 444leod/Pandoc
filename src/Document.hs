@@ -84,7 +84,7 @@ newtype Paragraph = Paragraph {_paragraphContent :: [ParagraphContent]}
 -}
 data ParagraphContent = 
     PText String |
-    PFormating Style |
+    PFormat Format |
     PImage Image |
     PLink Link deriving (Show)
 
@@ -121,8 +121,8 @@ data ListContent =
     LParagraph Paragraph |
     SubList List deriving (Show)
 
--- DOCUMENT/BODY/CONTENT/**/TEXT/STYLE
-{- | Style
-    Represents a style, with a bold, an italic and a code boolean
+-- DOCUMENT/BODY/CONTENT/**/TEXT/FORMAT
+{- | Format
+    Represents a format, with a bold, an italic and a code boolean
 -}
-data Style = BOLD | ITALIC | CODE deriving (Enum, Show)
+data Format = BOLD | ITALIC | CODE deriving (Enum, Show)
