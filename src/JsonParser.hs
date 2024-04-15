@@ -226,8 +226,11 @@ getContent (JObject [("codeblock", obj)]) = do
     codeblock <- getCodeblock obj
     return $ CCodeBlock $ CodeBlock codeblock
 getContent (JObject [("list", obj)]) = do
-    list <- trace (show obj) (getList obj)
+    list <- getList obj
     return $ CList $ List list
+getContent (JObject [("link", val)]) = do
+    res <- getLink val
+    return $ CLink res
 getContent _ = Nothing
 
 getParagraph :: [JsonValue] -> Maybe [ParagraphContent]

@@ -60,6 +60,8 @@ data Content =
     CSection Section |
     CParagraph Paragraph |
     CList List |
+    CLink Link |
+    CImage Image |
     CCodeBlock CodeBlock deriving (Show)
 
 -- DOCUMENT/BODY/CONTENT/SECTION
