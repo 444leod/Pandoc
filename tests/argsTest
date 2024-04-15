@@ -1,0 +1,99 @@
+#!/usr/bin/env python3
+
+##
+## EPITECH PROJECT, 2024
+## Pandoc
+## File description:
+## funcTest
+##
+
+import unittest
+import subprocess
+from colour_runner.runner import ColourTextTestRunner
+
+def run_main_with_args(args):
+    process = subprocess.run(['./mypandoc'] + args, capture_output=True, text=True)
+    return process.stdout, process.stderr, process.returncode
+
+class TestMain(unittest.TestCase):
+
+    def test_no_arguments(self):
+        stdout, stderr, returncode = run_main_with_args([])
+        self.assertEqual(stdout, '')
+        self.assertIn('USAGE: ./mypandoc -i ifile -f oformat [-o ofile] [-e iformat]', stderr)
+        self.assertEqual(returncode, 84)
+
+    def test_1_argument(self):
+        stdout, stderr, returncode = run_main_with_args(['-i'])
+        self.assertEqual(stdout, '')
+        self.assertIn('USAGE: ./mypandoc -i ifile -f oformat [-o ofile] [-e iformat]', stderr)
+        self.assertEqual(returncode, 84)
+
+    def test_2_arguments(self):
+        stdout, stderr, returncode = run_main_with_args(['-i', 'input'])
+        self.assertEqual(stdout, '')
+        self.assertIn('USAGE: ./mypandoc -i ifile -f oformat [-o ofile] [-e iformat]', stderr)
+        self.assertEqual(returncode, 84)
+
+    def test_3_arguments(self):
+        stdout, stderr, returncode = run_main_with_args(['-i', 'testFiles/rightJSONFiles.json', '-f'])
+        self.assertEqual(stdout, '')
+        self.assertIn('USAGE: ./mypandoc -i ifile -f oformat [-o ofile] [-e iformat]', stderr)
+        self.assertEqual(returncode, 84)
+
+    def test_5_arguments(self):
+        stdout, stderr, returncode = run_main_with_args(['-i', 'input', '-f', 'json', '-o'])
+        self.assertEqual(stdout, '')
+        self.assertIn('USAGE: ./mypandoc -i ifile -f oformat [-o ofile] [-e iformat]', stderr)
+        self.assertEqual(returncode, 84)
+
+    def test_7_arguments(self):
+        stdout, stderr, returncode = run_main_with_args(['-i', 'testFiles/rightJSONFile.json', '-f', 'xml', '-o', 'output', '-e'])
+        self.assertEqual(stdout, '')
+        self.assertIn('USAGE: ./mypandoc -i ifile -f oformat [-o ofile] [-e iformat]', stderr)
+        self.assertEqual(returncode, 84)
+
+    def test_more_than_8_arguments(self):
+        stdout, stderr, returncode = run_main_with_args(['-i', 'testFiles/rightJSONFile.json', '-f', 'xml', '-o', 'output', '-e', 'xml', '-a'])
+        self.assertEqual(stdout, '')
+        self.assertIn('USAGE: ./mypandoc -i ifile -f oformat [-o ofile] [-e iformat]', stderr)
+        self.assertEqual(returncode, 84)
+
+    def test_missing_input_file(self):
+        stdout, stderr, returncode = run_main_with_args(['-f', 'json'])
+        self.assertEqual(stdout, '')
+        self.assertIn('i is missing.', stderr)
+        self.assertEqual(returncode, 84)
+
+    def test_missing_format(self):
+        stdout, stderr, returncode = run_main_with_args(['-i', 'testFiles/rightJSONFile.json'])
+        self.assertEqual(stdout, '')
+        self.assertIn('f is missing.', stderr)
+        self.assertEqual(returncode, 84)
+
+    def test_cannot_open_input_file(self):
+        stdout, stderr, returncode = run_main_with_args(['-i', 'invalidInput', '-f', 'json'])
+        self.assertEqual(stdout, '')
+        self.assertIn('No such file or directory', stderr)
+        self.assertEqual(returncode, 84)
+
+    def test_invalid_format(self):
+        stdout, stderr, returncode = run_main_with_args(['-i', 'testFiles/rightJSONFile.json', '-f', 'invalidFormat'])
+        self.assertEqual(stdout, '')
+        self.assertIn('invalid arguments', stderr)
+        self.assertEqual(returncode, 84)
+
+    def test_4_valid_arguments(self):
+        stdout, stderr, returncode = run_main_with_args(['-i', 'tests/testFiles/rightMDFile.md', '-f', 'json'])
+        self.assertNotEqual(stdout, '')
+        self.assertEqual(stderr, '')
+        self.assertEqual(returncode, 0)
+
+    def test_invalid_flags(self):
+        stdout, stderr, returncode = run_main_with_args(['-a', 'testFiles/rightJSONFile.json', '-f', 'json'])
+        self.assertEqual(stdout, '')
+        self.assertIn('invalid arguments', stderr)
+        self.assertEqual(returncode, 84)
+
+if __name__ == '__main__':
+    unittest.main(testRunner=ColourTextTestRunner, verbosity=2)
