@@ -17,6 +17,7 @@ module Document
     , Link(..)
     , List(..)
     , ListContent(..)
+    , CodeBlock(..)
     , Format(..)
 ) where
 
@@ -48,7 +49,7 @@ data Header = Header {
     Represents a body, with a list of content, this is where the content is 
     There is only one body per document
 -}
-newtype Body = Body {_content :: [Content]} deriving (Show)
+newtype Body = Body [Content] deriving (Show)
 
 -- DOCUMENT/BODY/CONTENT
 {- | Content
@@ -58,7 +59,7 @@ data Content =
     CSection Section |
     CParagraph Paragraph |
     CList List |
-    CodeBlock String deriving (Show)
+    CCodeBlock CodeBlock deriving (Show)
 
 -- DOCUMENT/BODY/CONTENT/SECTION
 {- | Section
@@ -75,8 +76,7 @@ data Section = Section {
     Represents a paragraph, with a list of paragraph content
     Assembling this list of paragraph content will give a sensable paragraph
 -}
-newtype Paragraph = Paragraph {_paragraphContent :: [ParagraphContent]}
-    deriving (Show)
+newtype Paragraph = Paragraph [ParagraphContent] deriving (Show)
 
 -- DOCUMENT/BODY/CONTENT/PARAGRAPH/PARAGRAPHCONTENT
 {- | ParagraphContent
@@ -110,7 +110,13 @@ data Link = Link {
     Represents a list, with a list of ListContent
     (A list can contain a list)
 -}
-newtype List = List {_listContent :: [ListContent]} deriving (Show)
+newtype List = List [ListContent] deriving (Show)
+
+-- DOCUMENT/BODY/CONTENT/CODEBLOCK
+{- | Codeblock
+    Represents a code block, with a list of paragraph
+-}
+newtype CodeBlock = CodeBlock [Paragraph] deriving (Show)
 
 -- DOCUMENT/BODY/CONTENT/LIST/LISTCONTENT
 {- | ListContent

@@ -222,6 +222,9 @@ getContent :: JsonValue -> Maybe Content
 getContent (JArray arr) = do
     paragraph <- getParagraph arr
     return $ CParagraph $ Paragraph paragraph
+getContent (JObject [("codeblock", obj)]) = do
+    codeblock <- getCodeblock obj
+    return $ CCodeBlock $ CodeBlock codeblock
 getContent _ = Nothing
 
 getParagraph :: [JsonValue] -> Maybe [ParagraphContent]
@@ -244,7 +247,6 @@ getFormat ("bold", val) = getBold val
 getFormat ("italic", val) = getItalic val
 getFormat ("code", val) = getCode val
 getFormat _ = Nothing
-
 
 getBold :: JsonValue -> Maybe Format
 getBold (JString str) = Just $ Bold $ FContent str
@@ -269,6 +271,14 @@ getCode (JObject obj) = do
     res <- getFormat (head obj)
     return $ Code res
 getCode _ = Nothing
+
+getCodeblock :: JsonValue -> Maybe [Paragraph]
+getCodeblock (JArray []) = Just []
+getCodeblock (JArray (JArray x:xs)) =  do
+    code <- getParagraph x
+    rest <- getCodeblock (JArray xs)
+    return $ Paragraph code : rest
+getCodeblock _ = Nothing
 
 lookupOptionalString :: String -> [(String, JsonValue)] -> Maybe String
 lookupOptionalString key obj = case lookup key obj of
