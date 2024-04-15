@@ -202,11 +202,32 @@ getHeader ("header", JObject obj) = do
 getHeader _ = Nothing
 
 getBody :: (String, JsonValue) -> Maybe Body
-getBody ("body", JArray _) = do
-    return $ Body {
-        _content = []
-    }
+getBody ("body", JArray arr) = Body <$> getBodyContent arr
 getBody _ = Nothing
+
+getBodyContent :: [JsonValue] -> Maybe [Content]
+getBodyContent [] = Just []
+getBodyContent (x:xs) = do
+    content <- getContent x
+    rest <- getBodyContent xs
+    return $ content : rest
+
+getContent :: JsonValue -> Maybe Content
+getContent (JArray arr) = do
+    paragraph <- getParagraph arr
+    return $ CParagraph $ Paragraph paragraph
+getContent _ = Nothing
+
+getParagraph :: [JsonValue] -> Maybe [ParagraphContent]
+getParagraph [] = Just []
+getParagraph (x:xs) = do
+    text <- getParagraphContent x
+    rest' <- getParagraph xs
+    return $ text : rest'
+
+getParagraphContent :: JsonValue -> Maybe ParagraphContent
+getParagraphContent (JString str) = Just $ PText str
+getParagraphContent _ = Nothing
 
 lookupOptionalString :: String -> [(String, JsonValue)] -> Maybe String
 lookupOptionalString key obj = case lookup key obj of

@@ -17,7 +17,6 @@ module Document
     , Link(..)
     , List(..)
     , ListContent(..)
-    , Text(..)
     , Style(..)
 ) where
 
@@ -76,14 +75,16 @@ data Section = Section {
     Represents a paragraph, with a list of paragraph content
     Assembling this list of paragraph content will give a sensable paragraph
 -}
-newtype Paragraph = Paragraph {_paragraphContent :: [ParagraphContent]} deriving (Show)
+newtype Paragraph = Paragraph {_paragraphContent :: [ParagraphContent]}
+    deriving (Show)
 
 -- DOCUMENT/BODY/CONTENT/PARAGRAPH/PARAGRAPHCONTENT
 {- | ParagraphContent
     Can either be a text, an image or a link
 -}
 data ParagraphContent = 
-    PText Text |
+    PText String |
+    PFormating Style |
     PImage Image |
     PLink Link deriving (Show)
 
@@ -117,27 +118,11 @@ newtype List = List {_listContent :: [ListContent]} deriving (Show)
     Can either be a text or a sublist
 -}
 data ListContent =
-    ListText Text |
+    LParagraph Paragraph |
     SubList List deriving (Show)
-
--- DOCUMENT/BODY/CONTENT/**/TEXT
-{- | Text
-    Represents a text, with a value and a style
-    The value is the text itself
-    The style is the style of the text
--}
-data Text = Text {
-    _value :: String,
-    _style :: Style
-} deriving (Show)
 
 -- DOCUMENT/BODY/CONTENT/**/TEXT/STYLE
 {- | Style
     Represents a style, with a bold, an italic and a code boolean
-    A text can be any conbination of bold, italic and code (or none of them)
 -}
-data Style = Style {
-    _bold :: Bool,
-    _italic :: Bool,
-    _code :: Bool
-} deriving (Show)
+data Style = BOLD | ITALIC | CODE deriving (Enum, Show)
