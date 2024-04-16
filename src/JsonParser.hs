@@ -17,7 +17,6 @@ module JsonParser
 
 import ParserLib
 import Document
-import Debug.Trace
 
 --- JSON PARSING FUNCTIONS ---
 
@@ -234,7 +233,19 @@ getContent (JObject [("link", val)]) = do
 getContent (JObject [("image", val)]) = do
     res <- getImage val
     return $ CImage res
+getContent (JObject [("section", val)]) = do
+    res <- getSection val
+    return $ CSection res
 getContent _ = Nothing
+
+getSection :: JsonValue -> Maybe Section
+getSection (JObject (_:_:_:_)) = Nothing
+getSection (JObject obj) = case (lookup "title" obj, lookup "content" obj) of
+    (Just(JString title'), Just (JArray arr)) -> do
+        content' <- getBodyContent arr
+        return Section {_sectionTitle = title', _sectionContent = content'}
+    _ -> Nothing
+getSection _ = Nothing
 
 getParagraph :: [JsonValue] -> Maybe [ParagraphContent]
 getParagraph [] = Just []
