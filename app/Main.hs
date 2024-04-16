@@ -31,6 +31,8 @@ launchFile :: VerifiedConf -> IO ()
 launchFile conf = do
     fileContent <- readFile (_iFile conf)
     case runParser parseJsonValue fileContent of
-        Just (json, _) -> print (jsonToDocument json)
-        Nothing -> myError "Error: invalid json"
+        Just (json, _) -> case jsonToDocument json of
+            Just _ -> print (printJson json)
+            _ -> myError "Error: json is not a valid document"
+        _ -> myError "Error: invalid json"
     return ()
