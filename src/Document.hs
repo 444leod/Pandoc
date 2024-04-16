@@ -108,8 +108,6 @@ data Link = Link {
     _linkURL :: String
 } deriving (Show)
 
-newtype FormatList = FormatList [Format] deriving (Show)
-
 -- DOCUMENT/BODY/CONTENT/LIST
 {- | List
     Represents a list, with a list of ListContent
@@ -140,3 +138,9 @@ data Format =
     Italic Format |
     Code Format |
     FContent String deriving (Show)
+
+-- DOCUMENT/BODY/CONTENT/**/FORMAT
+{- | FormatList
+    Represents a list of format
+-}
+newtype FormatList = FormatList [Format] deriving (Show)

@@ -8,7 +8,7 @@
 module Main(main) where
 
 import System.Environment(getArgs)
-import JsonParser (parseJsonValue, printJson, jsonToDocument)
+import Json (parseJsonValue, printJson, jsonToDocument)
 import ParserLib (runParser)
 import Config
 
