@@ -8,7 +8,7 @@
 module Main(main) where
 
 import System.Environment(getArgs)
-import JsonParser (parseJsonValue, printJson)
+import Json (parseJsonValue, printJson, jsonToDocument)
 import ParserLib (runParser)
 import Config
 
@@ -29,6 +29,10 @@ main = do
 -}
 launchFile :: VerifiedConf -> IO ()
 launchFile conf = do
-    readFile (_iFile conf) >>=
-        putStrLn . maybe "Invalid Json"(printJson . fst) . runParser parseJsonValue
+    fileContent <- readFile (_iFile conf)
+    case runParser parseJsonValue fileContent of
+        Just (json, _) -> case jsonToDocument json of
+            Just _ -> print (printJson json)
+            _ -> myError "Error: json is not a valid document"
+        _ -> myError "Error: invalid json"
     return ()

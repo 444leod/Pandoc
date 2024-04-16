@@ -8,7 +8,6 @@
 module Document
     ( Document(..)
     , Header(..)
-    , Date(..)
     , Body(..)
     , Content(..)
     , Section(..)
@@ -18,8 +17,9 @@ module Document
     , Link(..)
     , List(..)
     , ListContent(..)
-    , Text(..)
-    , Style(..)
+    , CodeBlock(..)
+    , Format(..)
+    , FormatList(..)
 ) where
 
 -- DOCUMENT
@@ -32,7 +32,7 @@ module Document
 data Document = Document {
     _header :: Header,
     _body :: Body
-}
+} deriving (Show)
 
 -- DOCUMENT/HEADER
 {- | Header
@@ -42,25 +42,15 @@ data Document = Document {
 data Header = Header {
     _title :: String,
     _author :: Maybe String,
-    _date :: Maybe Date
-}
-
--- DOCUMENT/HEADER/DATE
-{- | Date
-    Represents a date, with a year, a day and a month
--}
-data Date = Date {
-    _year :: Int,
-    _day :: Int,
-    _month :: Int
-}
+    _date :: Maybe String
+} deriving (Show)
 
 -- DOCUMENT/BODY
 {- | Body
     Represents a body, with a list of content, this is where the content is 
     There is only one body per document
 -}
-newtype Body = Body {_content :: [Content]}
+newtype Body = Body [Content] deriving (Show)
 
 -- DOCUMENT/BODY/CONTENT
 {- | Content
@@ -70,7 +60,9 @@ data Content =
     CSection Section |
     CParagraph Paragraph |
     CList List |
-    CodeBlock String
+    CLink Link |
+    CImage Image |
+    CCodeBlock CodeBlock deriving (Show)
 
 -- DOCUMENT/BODY/CONTENT/SECTION
 {- | Section
@@ -80,75 +72,75 @@ data Content =
 data Section = Section {
     _sectionTitle :: String,
     _sectionContent :: [Content]
-}
+} deriving (Show)
 
 -- DOCUMENT/BODY/CONTENT/PARAGRAPH
 {- | Paragraph
     Represents a paragraph, with a list of paragraph content
     Assembling this list of paragraph content will give a sensable paragraph
 -}
-newtype Paragraph = Paragraph {_paragraphContent :: [ParagraphContent]}
+newtype Paragraph = Paragraph [ParagraphContent] deriving (Show)
 
 -- DOCUMENT/BODY/CONTENT/PARAGRAPH/PARAGRAPHCONTENT
 {- | ParagraphContent
     Can either be a text, an image or a link
 -}
 data ParagraphContent = 
-    PText Text |
     PImage Image |
-    PLink Link
+    PTextFormat Format |
+    PLink Link deriving (Show)
 
 -- DOCUMENT/BODY/CONTENT/PARAGRAPH/PARAGRAPHCONTENT/IMAGE
 {- | Image
     Represents an image, with a text and an URL to the image
 -}
 data Image = Image {
-    _imgText :: String,
+    _imgText :: FormatList,
     _imgURL :: String
-}
+} deriving (Show)
 
 -- DOCUMENT/BODY/CONTENT/PARAGRAPH/PARAGRAPHCONTENT/LINK
 {- | Link
     Represents a link, with a text and an URL
 -}
 data Link = Link {
-    _linkText :: String,
+    _linkText :: FormatList,
     _linkURL :: String
-}
+} deriving (Show)
 
 -- DOCUMENT/BODY/CONTENT/LIST
 {- | List
     Represents a list, with a list of ListContent
     (A list can contain a list)
 -}
-newtype List = List {_listContent :: [ListContent]}
+newtype List = List [ListContent] deriving (Show)
+
+-- DOCUMENT/BODY/CONTENT/CODEBLOCK
+{- | Codeblock
+    Represents a code block, with a list of paragraph
+-}
+newtype CodeBlock = CodeBlock [Paragraph] deriving (Show)
 
 -- DOCUMENT/BODY/CONTENT/LIST/LISTCONTENT
 {- | ListContent
     Can either be a text or a sublist
 -}
 data ListContent =
-    ListText Text |
-    SubList List
+    LParagraph Paragraph |
+    SubList List deriving (Show)
 
--- DOCUMENT/BODY/CONTENT/**/TEXT
-{- | Text
-    Represents a text, with a value and a style
-    The value is the text itself
-    The style is the style of the text
+-- DOCUMENT/BODY/CONTENT/**/FORMAT
+{- | Format
+    Represents a format, with a bold, an italic and a code Format
 -}
-data Text = Text {
-    _value :: String,
-    _style :: Style
-}
+data Format =
+    Bold Format |
+    Italic Format |
+    Code Format |
+    FContent String deriving (Show)
 
--- DOCUMENT/BODY/CONTENT/**/TEXT/STYLE
-{- | Style
-    Represents a style, with a bold, an italic and a code boolean
-    A text can be any conbination of bold, italic and code (or none of them)
+-- DOCUMENT/BODY/CONTENT/**/FORMAT
+{- | FormatList
+    Represents a list of format
 -}
-data Style = Style {
-    _bold :: Bool,
-    _italic :: Bool,
-    _code :: Bool
-}
+newtype FormatList = FormatList [Format] deriving (Show)
