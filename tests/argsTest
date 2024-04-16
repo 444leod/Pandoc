@@ -9,91 +9,144 @@
 
 import unittest
 import subprocess
-from colour_runner.runner import ColourTextTestRunner
 
-def run_main_with_args(args):
+def run_pandoc_with_args(args):
     process = subprocess.run(['./mypandoc'] + args, capture_output=True, text=True)
     return process.stdout, process.stderr, process.returncode
 
-class TestMain(unittest.TestCase):
+class CommandLineArgs(unittest.TestCase):
 
-    def test_no_arguments(self):
-        stdout, stderr, returncode = run_main_with_args([])
+    def test_error_if_no_arguments(self):
+        stdout, stderr, returncode = run_pandoc_with_args([])
         self.assertEqual(stdout, '')
         self.assertIn('USAGE: ./mypandoc -i ifile -f oformat [-o ofile] [-e iformat]', stderr)
         self.assertEqual(returncode, 84)
 
-    def test_1_argument(self):
-        stdout, stderr, returncode = run_main_with_args(['-i'])
+    def test_error_if_1_argument(self):
+        stdout, stderr, returncode = run_pandoc_with_args(['-i'])
         self.assertEqual(stdout, '')
         self.assertIn('USAGE: ./mypandoc -i ifile -f oformat [-o ofile] [-e iformat]', stderr)
         self.assertEqual(returncode, 84)
 
-    def test_2_arguments(self):
-        stdout, stderr, returncode = run_main_with_args(['-i', 'input'])
+    def test_error_if_2_arguments(self):
+        stdout, stderr, returncode = run_pandoc_with_args(['-i', 'input'])
         self.assertEqual(stdout, '')
         self.assertIn('USAGE: ./mypandoc -i ifile -f oformat [-o ofile] [-e iformat]', stderr)
         self.assertEqual(returncode, 84)
 
-    def test_3_arguments(self):
-        stdout, stderr, returncode = run_main_with_args(['-i', 'testFiles/rightJSONFiles.json', '-f'])
+    def test_error_if_3_arguments(self):
+        stdout, stderr, returncode = run_pandoc_with_args(['-i', 'testFiles/rightJSONFiles.json', '-f'])
         self.assertEqual(stdout, '')
         self.assertIn('USAGE: ./mypandoc -i ifile -f oformat [-o ofile] [-e iformat]', stderr)
         self.assertEqual(returncode, 84)
 
-    def test_5_arguments(self):
-        stdout, stderr, returncode = run_main_with_args(['-i', 'input', '-f', 'json', '-o'])
+    def test_error_if_5_arguments(self):
+        stdout, stderr, returncode = run_pandoc_with_args(['-i', 'input', '-f', 'json', '-o'])
         self.assertEqual(stdout, '')
         self.assertIn('USAGE: ./mypandoc -i ifile -f oformat [-o ofile] [-e iformat]', stderr)
         self.assertEqual(returncode, 84)
 
-    def test_7_arguments(self):
-        stdout, stderr, returncode = run_main_with_args(['-i', 'testFiles/rightJSONFile.json', '-f', 'xml', '-o', 'output', '-e'])
+    def test_error_if_7_arguments(self):
+        stdout, stderr, returncode = run_pandoc_with_args(['-i', 'testFiles/rightJSONFile.json', '-f', 'xml', '-o', 'output', '-e'])
         self.assertEqual(stdout, '')
         self.assertIn('USAGE: ./mypandoc -i ifile -f oformat [-o ofile] [-e iformat]', stderr)
         self.assertEqual(returncode, 84)
 
-    def test_more_than_8_arguments(self):
-        stdout, stderr, returncode = run_main_with_args(['-i', 'testFiles/rightJSONFile.json', '-f', 'xml', '-o', 'output', '-e', 'xml', '-a'])
+    def test_error_if_more_than_8_arguments(self):
+        stdout, stderr, returncode = run_pandoc_with_args(['-i', 'testFiles/rightJSONFile.json', '-f', 'xml', '-o', 'output', '-e', 'xml', '-a'])
         self.assertEqual(stdout, '')
         self.assertIn('USAGE: ./mypandoc -i ifile -f oformat [-o ofile] [-e iformat]', stderr)
         self.assertEqual(returncode, 84)
 
-    def test_missing_input_file(self):
-        stdout, stderr, returncode = run_main_with_args(['-f', 'json'])
+    def test_error_if_missing_input_file(self):
+        stdout, stderr, returncode = run_pandoc_with_args(['-f', 'json'])
         self.assertEqual(stdout, '')
         self.assertIn('i is missing.', stderr)
         self.assertEqual(returncode, 84)
 
-    def test_missing_format(self):
-        stdout, stderr, returncode = run_main_with_args(['-i', 'testFiles/rightJSONFile.json'])
+    def test_error_if_missing_format(self):
+        stdout, stderr, returncode = run_pandoc_with_args(['-i', 'testFiles/rightJSONFile.json'])
         self.assertEqual(stdout, '')
         self.assertIn('f is missing.', stderr)
         self.assertEqual(returncode, 84)
 
-    def test_cannot_open_input_file(self):
-        stdout, stderr, returncode = run_main_with_args(['-i', 'invalidInput', '-f', 'json'])
+    def test_error_if_cannot_open_input_file(self):
+        stdout, stderr, returncode = run_pandoc_with_args(['-i', 'invalidInput', '-f', 'json'])
         self.assertEqual(stdout, '')
         self.assertIn('No such file or directory', stderr)
         self.assertEqual(returncode, 84)
 
     def test_invalid_format(self):
-        stdout, stderr, returncode = run_main_with_args(['-i', 'testFiles/rightJSONFile.json', '-f', 'invalidFormat'])
+        stdout, stderr, returncode = run_pandoc_with_args(['-i', 'testFiles/rightJSONFile.json', '-f', 'invalidFormat'])
         self.assertEqual(stdout, '')
         self.assertIn('invalid arguments', stderr)
         self.assertEqual(returncode, 84)
 
-    def test_4_valid_arguments(self):
-        stdout, stderr, returncode = run_main_with_args(['-i', 'tests/testFiles/rightMDFile.md', '-f', 'json'])
+    def test_valid_json_format(self):
+        stdout, stderr, returncode = run_pandoc_with_args(['-i', 'tests/testFiles/rightJSONFile.json', '-f', 'json'])
+        self.assertNotEqual(stdout, '')
+        self.assertEqual(stderr, '')
+        self.assertEqual(returncode, 0)
+
+    def test_valid_xml_format(self):
+        stdout, stderr, returncode = run_pandoc_with_args(['-i', 'tests/testFiles/rightXMLFile.xml', '-f', 'xml'])
+        self.assertNotEqual(stdout, '')
+        self.assertEqual(stderr, '')
+        self.assertEqual(returncode, 0)
+
+    def test_valid_md_format(self):
+        stdout, stderr, returncode = run_pandoc_with_args(['-i', 'tests/testFiles/rightMDFile.md', '-f', 'markdown'])
+        self.assertNotEqual(stdout, '')
+        self.assertEqual(stderr, '')
+        self.assertEqual(returncode, 0)
+
+    def test_invalid_json_input_file(self):
+        stdout, stderr, returncode = run_pandoc_with_args(['-i', 'tests/testFiles/wrongJSONFile.json', '-f', 'xml'])
+        self.assertEqual(stdout, '')
+        self.assertIn('Invalid Json', stderr)
+        self.assertEqual(returncode, 84)
+
+    def test_invalid_xml_input_file(self):
+        stdout, stderr, returncode = run_pandoc_with_args(['-i', 'tests/testFiles/wrongXMLFile.xml', '-f', 'json'])
+        self.assertEqual(stdout, '')
+        self.assertIn('Invalid XML', stderr)
+        self.assertEqual(returncode, 84)
+
+    def test_invalid_md_input_file(self):
+        stdout, stderr, returncode = run_pandoc_with_args(['-i', 'tests/testFiles/wrongMDFile.md', '-f', 'json'])
+        self.assertEqual(stdout, '')
+        self.assertIn('Invalid Markdown', stderr)
+        self.assertEqual(returncode, 84)
+
+    def test_valid_json_input_file(self):
+        stdout, stderr, returncode = run_pandoc_with_args(['-i', 'tests/testFiles/rightJSONFile.json', '-f', 'xml'])
+        self.assertNotEqual(stdout, '')
+        self.assertEqual(stderr, '')
+        self.assertEqual(returncode, 0)
+
+    def test_valid_xml_input_file(self):
+        stdout, stderr, returncode = run_pandoc_with_args(['-i', 'tests/testFiles/rightXMLFile.xml', '-f', 'json'])
+        self.assertNotEqual(stdout, '')
+        self.assertEqual(stderr, '')
+        self.assertEqual(returncode, 0)
+
+    def test_valid_md_input_file(self):
+        stdout, stderr, returncode = run_pandoc_with_args(['-i', 'tests/testFiles/rightMDFile.md', '-f', 'json'])
+        self.assertNotEqual(stdout, '')
+        self.assertEqual(stderr, '')
+        self.assertEqual(returncode, 0)
+
+    def test_valid_4_arguments(self):
+        stdout, stderr, returncode = run_pandoc_with_args(['-i', 'tests/testFiles/rightMDFile.md', '-f', 'json'])
         self.assertNotEqual(stdout, '')
         self.assertEqual(stderr, '')
         self.assertEqual(returncode, 0)
 
     def test_invalid_flags(self):
-        stdout, stderr, returncode = run_main_with_args(['-a', 'testFiles/rightJSONFile.json', '-f', 'json'])
+        stdout, stderr, returncode = run_pandoc_with_args(['-a', 'testFiles/rightJSONFile.json', '-f', 'json'])
         self.assertEqual(stdout, '')
         self.assertIn('invalid arguments', stderr)
         self.assertEqual(returncode, 84)
 
 if __name__ == '__main__':
-    unittest.main(testRunner=ColourTextTestRunner, verbosity=2)
+    unittest.main(verbosity=2)
