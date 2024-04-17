@@ -38,6 +38,7 @@ bodyToJson (Body content) = JArray (map contentToJson content)
 
 contentToJson :: Content -> JsonValue
 contentToJson (CParagraph (Paragraph paragraph)) = JArray (map paragraphContentToJson paragraph)
+contentToJson (CImage img) = imageToJson img
 contentToJson _ = Null
 
 paragraphContentToJson :: ParagraphContent -> JsonValue
