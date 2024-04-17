@@ -22,8 +22,8 @@ documentToJson (Document header body) = JObject [
 headerToJson :: Header -> JsonValue
 headerToJson (Header title (Just author) (Just date)) = JObject [
     ("title", JString title),
-    ("author", JString author),
-    ("date", JString date)]
+    ("date", JString date),
+    ("author", JString author)]
 headerToJson (Header title Nothing (Just date)) = JObject [
     ("title", JString title),
     ("date", JString date)]
@@ -42,6 +42,7 @@ contentToJson _ = Null
 
 paragraphContentToJson :: ParagraphContent -> JsonValue
 paragraphContentToJson (PTextFormat text) = formatToJson text
+paragraphContentToJson (PImage img) = imageToJson img
 paragraphContentToJson _ = Null
 
 formatToJson :: Format -> JsonValue
@@ -49,3 +50,11 @@ formatToJson (FContent text) = JString text
 formatToJson (Bold bold) = JObject [("bold", formatToJson bold)]
 formatToJson (Italic italic) = JObject [("italic", formatToJson italic)]
 formatToJson (Code code) = JObject [("code", formatToJson code)]
+
+imageToJson :: Image -> JsonValue
+imageToJson (Image alt url) = JObject[("image", JObject [
+    ("url", JString url),
+    ("alt", formatListToJson alt)])]
+
+formatListToJson :: FormatList -> JsonValue
+formatListToJson (FormatList list) = JArray (map formatToJson list)
