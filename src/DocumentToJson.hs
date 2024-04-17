@@ -43,7 +43,7 @@ contentToJson (CImage img) = imageToJson img
 contentToJson (CLink link) = linkToJson link
 contentToJson (CList list) = listToJson list
 contentToJson (CCodeBlock codeblock) = codeblockToJson codeblock
-contentToJson _ = Null
+contentToJson (CSection section) = sectionToJson section
 
 paragraphContentToJson :: ParagraphContent -> JsonValue
 paragraphContentToJson (PTextFormat text) = formatToJson text
@@ -83,6 +83,13 @@ paragraphToJson :: Paragraph -> JsonValue
 paragraphToJson (Paragraph paragraph) =
     JArray (map paragraphContentToJson paragraph)
 
+sectionToJson :: Section -> JsonValue
+sectionToJson (Section title content) = 
+    JObject [("section",
+    JObject [
+        ("title", JString title),
+        ("content", JArray (map contentToJson content))]
+    )]
+
 formatListToJson :: FormatList -> JsonValue
 formatListToJson (FormatList list) = JArray (map formatToJson list)
-
