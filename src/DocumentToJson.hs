@@ -37,9 +37,11 @@ bodyToJson :: Body -> JsonValue
 bodyToJson (Body content) = JArray (map contentToJson content)
 
 contentToJson :: Content -> JsonValue
-contentToJson (CParagraph (Paragraph paragraph)) = JArray (map paragraphContentToJson paragraph)
+contentToJson (CParagraph (Paragraph paragraph)) =
+    JArray (map paragraphContentToJson paragraph)
 contentToJson (CImage img) = imageToJson img
 contentToJson (CLink link) = linkToJson link
+contentToJson (CList list) = listToJson list
 contentToJson _ = Null
 
 paragraphContentToJson :: ParagraphContent -> JsonValue
@@ -62,6 +64,13 @@ linkToJson :: Link -> JsonValue
 linkToJson (Link alt url) = JObject[("link", JObject [
     ("url", JString url),
     ("content", formatListToJson alt)])]
+
+listToJson :: List -> JsonValue
+listToJson (List list) = JObject[("list", JArray (map listContentToJson list))]
+
+listContentToJson :: ListContent -> JsonValue
+listContentToJson (LParagraph par) = contentToJson (CParagraph par)
+listContentToJson (SubList list) = listToJson list
 
 formatListToJson :: FormatList -> JsonValue
 formatListToJson (FormatList list) = JArray (map formatToJson list)
