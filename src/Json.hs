@@ -97,20 +97,21 @@ getJArray arr = Parser $ \str ->
         (']':rest) -> Just (arr, rest)
         _ -> do
             (result, rest) <- runParser (removePadding *> parseJsonValue) str
-            (_, rest2) <- runParser (removePadding *> parseComma) rest
+            (_, rest2) <- runParser (removePadding *> parseCommaJArray) rest
             runParser (getJArray (arr ++ [result])) rest2
 
-{- | parseComma function
-    Used to parse a comma in an JAarray
+{- | parseCommaJArray function
+    Used to parse a comma in an JArray
     Return a comma or an empty string or Nothing
 -}
-parseComma :: Parser String
-parseComma = Parser $ \str ->
+parseCommaJArray :: Parser String
+parseCommaJArray = Parser $ \str ->
   case str of
     (',':']':_) -> Nothing
+    (']':_) -> Just ("", str)
     (x:xs)
         | x == ',' -> Just (",", xs)
-        | otherwise -> Just ("", x:xs)
+        | otherwise -> Nothing
     _ -> Just ("", str)
 
 {- | parseJObject function
@@ -135,8 +136,22 @@ getJObject arr = Parser $ \str -> case str of
             (_, rest2) <- runParser (removePadding *> parseChar ':') rest
             (result2, rest3) <- runParser (removePadding
                 *> parseJsonValue) rest2
-            (_, rest4) <- runParser (removePadding *> parseComma) rest3
+            (_, rest4) <- runParser (removePadding *> parseCommaJObject) rest3
             runParser (getJObject (arr ++ [(result, result2)])) rest4
+
+{- | parseCommaJObject function
+    Used to parse a comma in an JObject
+    Return a comma or an empty string or Nothing
+-}
+parseCommaJObject :: Parser String
+parseCommaJObject = Parser $ \str ->
+  case str of
+    (',':'}':_) -> Nothing
+    ('}':_) -> Just ("", str)
+    (x:xs)
+        | x == ',' -> Just (",", xs)
+        | otherwise -> Nothing
+    _ -> Just ("", str)
 
 {- | parseJsonValue function
     Parse a JSON value from a string
