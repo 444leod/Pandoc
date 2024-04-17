@@ -42,6 +42,7 @@ contentToJson (CParagraph (Paragraph paragraph)) =
 contentToJson (CImage img) = imageToJson img
 contentToJson (CLink link) = linkToJson link
 contentToJson (CList list) = listToJson list
+contentToJson (CCodeBlock codeblock) = codeblockToJson codeblock
 contentToJson _ = Null
 
 paragraphContentToJson :: ParagraphContent -> JsonValue
@@ -69,8 +70,18 @@ listToJson :: List -> JsonValue
 listToJson (List list) = JObject[("list", JArray (map listContentToJson list))]
 
 listContentToJson :: ListContent -> JsonValue
-listContentToJson (LParagraph par) = contentToJson (CParagraph par)
+listContentToJson (LParagraph (Paragraph paragraph)) =
+    JArray (map paragraphContentToJson paragraph)
 listContentToJson (SubList list) = listToJson list
+
+codeblockToJson :: CodeBlock -> JsonValue
+codeblockToJson (CodeBlock paragraphArr) =
+    JObject[("codeblock",
+    JArray (map paragraphToJson paragraphArr))]
+
+paragraphToJson :: Paragraph -> JsonValue
+paragraphToJson (Paragraph paragraph) =
+    JArray (map paragraphContentToJson paragraph)
 
 formatListToJson :: FormatList -> JsonValue
 formatListToJson (FormatList list) = JArray (map formatToJson list)
