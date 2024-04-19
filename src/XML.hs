@@ -7,17 +7,16 @@
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
 {-# HLINT ignore "Use lambda-case" #-}
 
-module Json
+module XML
     ( XMLValue(..)
 ) where
 
 import ParserLib
-import Document
 
 data XMLValue = XMLValue {
-    name :: String,
-    attributes :: [(String, String)],
-    childrens :: [XMLChild]
+    _name :: String,
+    _attributes :: [(String, String)],
+    _childrens :: [XMLChild]
 } deriving (Show)
 
 data XMLChild =

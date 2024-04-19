@@ -15,7 +15,6 @@ module Json
 ) where
 
 import ParserLib
-import Document
 
 --- JSON PARSING FUNCTIONS ---
 
