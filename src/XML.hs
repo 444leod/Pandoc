@@ -29,25 +29,11 @@ parseXMLValue :: Parser XMLValue
 parseXMLValue = Parser $ \str ->
     case str of
         ('<':rest) -> do
-            (name, rest') <- runParser (expectNoSeparators " \t\n" *> parseName) rest
-            (attributes, rest'') <- trace (show rest') (runParser parseAttributes rest')
+            (name, rest') <-
+                runParser (expectNoSeparators " \t\n" *> parseName) rest
+            (attributes, rest'') <- runParser parseAttributes rest'
             -- (childrens, rest''') <- runParser parseChildrens rest''
             Just (XMLValue name attributes [], rest'')
-        _ -> Nothing
-
-parseUntilChars :: String -> Parser String
-parseUntilChars chars = Parser $ \str -> Just (span (`notElem` chars) str)
-
-expectSeparators :: String -> Parser ()
-expectSeparators separators = Parser $ \str ->
-    case str of
-        (c:_) | c `elem` separators -> Just ((), str)
-        _ -> Nothing
-
-expectNoSeparators :: String -> Parser ()
-expectNoSeparators separators = Parser $ \str ->
-    case str of
-        (c:_) | c `notElem` separators -> Just ((), str)
         _ -> Nothing
 
 parseName :: Parser String
