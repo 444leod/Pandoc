@@ -40,3 +40,15 @@ parseUntilChars chars = Parser $ \str -> Just (span (`notElem` chars) str)
 parseName :: Parser String
 parseName = Parser $ \str ->
     runParser (removePadding *> parseUntilChars " \t\n") str
+
+parseAttributes :: Parser [(String, String)]
+parseAttributes = Parser $ \str ->
+    case str of
+        ('>':rest) -> Just ([], rest)
+        _ -> do
+            (name, rest') <-runParser (removePadding *>
+                parseUntilChars "= \t\n") str
+            (value, rest'') <- runParser (removePadding *> parseChar '=' *>
+                removePadding *> parseString <* removePadding) rest'
+            (attributes, rest''') <- runParser parseAttributes rest''
+            Just ((name, value):attributes, rest''')
