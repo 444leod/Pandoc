@@ -13,6 +13,8 @@ module XML
 
 import ParserLib
 
+import Debug.Trace
+
 data XMLValue = XMLValue {
     _name :: String,
     _attributes :: [(String, String)],
@@ -23,31 +25,50 @@ data XMLChild =
     XMLText String |
     XMLNode XMLValue deriving (Show)
 
--- parseXMLValue :: Parser XMLValue
--- parseXMLValue = Parser $ \str ->
---     case str of
---         ('<':rest) -> do
---             (name, rest') <- runParser parseName rest
---             (attributes, rest'') <- runParser parseAttributes rest'
---             (childrens, rest''') <- runParser parseChildrens rest''
---             Just (XMLValue name attributes childrens, rest''')
---         _ -> Nothing
+parseXMLValue :: Parser XMLValue
+parseXMLValue = Parser $ \str ->
+    case str of
+        ('<':rest) -> do
+            (name, rest') <- runParser (expectNoSeparators " \t\n" *> parseName) rest
+            (attributes, rest'') <- trace (show rest') (runParser parseAttributes rest')
+            -- (childrens, rest''') <- runParser parseChildrens rest''
+            Just (XMLValue name attributes [], rest'')
+        _ -> Nothing
 
 parseUntilChars :: String -> Parser String
 parseUntilChars chars = Parser $ \str -> Just (span (`notElem` chars) str)
 
+expectSeparators :: String -> Parser ()
+expectSeparators separators = Parser $ \str ->
+    case str of
+        (c:_) | c `elem` separators -> Just ((), str)
+        _ -> Nothing
+
+expectNoSeparators :: String -> Parser ()
+expectNoSeparators separators = Parser $ \str ->
+    case str of
+        (c:_) | c `notElem` separators -> Just ((), str)
+        _ -> Nothing
+
 parseName :: Parser String
 parseName = Parser $ \str ->
-    runParser (removePadding *> parseUntilChars " \t\n") str
+    runParser (removePadding *> parseUntilChars " \t\n>") str
 
 parseAttributes :: Parser [(String, String)]
-parseAttributes = Parser $ \str ->
+parseAttributes = Parser $ \str -> do
+    (_, stopRest) <- runParser removePadding str
+    case stopRest of
+        ('>':stopRest') -> Just ([], stopRest')
+        _ -> runParser insideParseAttributes str
+
+insideParseAttributes :: Parser [(String, String)]
+insideParseAttributes = Parser $ \str ->
     case str of
         ('>':rest) -> Just ([], rest)
         _ -> do
-            (name, rest') <-runParser (removePadding *>
-                parseUntilChars "= \t\n") str
+            (name, rest') <- runParser (expectSeparators " \t\n" *>
+                removePadding *> parseUntilChars "= \t\n") str
             (value, rest'') <- runParser (removePadding *> parseChar '=' *>
                 removePadding *> parseString <* removePadding) rest'
-            (attributes, rest''') <- runParser parseAttributes rest''
+            (attributes, rest''') <- runParser insideParseAttributes rest''
             Just ((name, value):attributes, rest''')
