@@ -4,7 +4,6 @@
 -- File description:
 -- XML
 -}
-
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
 {-# HLINT ignore "Use lambda-case" #-}
 
@@ -24,3 +23,20 @@ data XMLValue = XMLValue {
 data XMLChild =
     XMLText String |
     XMLNode XMLValue deriving (Show)
+
+-- parseXMLValue :: Parser XMLValue
+-- parseXMLValue = Parser $ \str ->
+--     case str of
+--         ('<':rest) -> do
+--             (name, rest') <- runParser parseName rest
+--             (attributes, rest'') <- runParser parseAttributes rest'
+--             (childrens, rest''') <- runParser parseChildrens rest''
+--             Just (XMLValue name attributes childrens, rest''')
+--         _ -> Nothing
+
+parseUntilChars :: String -> Parser String
+parseUntilChars chars = Parser $ \str -> Just (span (`notElem` chars) str)
+
+parseName :: Parser String
+parseName = Parser $ \str ->
+    runParser (removePadding *> parseUntilChars " \t\n") str
