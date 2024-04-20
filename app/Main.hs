@@ -9,6 +9,7 @@ module Main(main) where
 
 import System.Environment(getArgs)
 import Json (parseJsonValue, printJson)
+import XML (parseXMLValue)
 import JsonToDocument (jsonToDocument)
 import DocumentToJson (documentToJson)
 import ParserLib (runParser)
