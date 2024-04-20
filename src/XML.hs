@@ -17,16 +17,30 @@ import ParserLib
 
 import Debug.Trace
 
+{- | XMLValue data type
+
+    Represents an XML value
+-}
 data XMLValue = XMLValue {
     _name :: String,
     _attributes :: [(String, String)],
     _childrens :: [XMLChild]
 } deriving (Show)
 
+{- | XMLChild data type
+
+    Represents an XML child
+    Can either be a text or a node
+-}
 data XMLChild =
     XMLText String |
     XMLNode XMLValue deriving (Show)
 
+{- | parseXMLValue function
+    
+    Parse an XML value
+    Return an XMLValue or Nothing
+-}
 parseXMLValue :: Parser XMLValue
 parseXMLValue = Parser $ \str ->
     case str of
@@ -39,10 +53,20 @@ parseXMLValue = Parser $ \str ->
             Just (XMLValue name attributes childs, rest''')
         _ -> Nothing
 
+{- | parseName function
+
+    Parse the name of a tag
+    Return a String or Nothing
+-}
 parseName :: Parser String
 parseName = Parser $ \str ->
     runParser (removePadding *> parseUntilChars " \t\n>") str
 
+{- | parseAttributes function
+    
+    Parse the attributes of a tag
+    Return a list of attributes or Nothing
+-}
 parseAttributes :: Parser [(String, String)]
 parseAttributes = Parser $ \str -> do
     (_, stopRest) <- runParser removePadding str
@@ -50,6 +74,11 @@ parseAttributes = Parser $ \str -> do
         ('>':stopRest') -> Just ([], stopRest')
         _ -> runParser insideParseAttributes str
 
+{- | insideParseAttributes function
+
+    Parse the attributes of a tag
+    Return a list of attributes or Nothing
+-}
 insideParseAttributes :: Parser [(String, String)]
 insideParseAttributes = Parser $ \str ->
     case str of
@@ -62,6 +91,11 @@ insideParseAttributes = Parser $ \str ->
             (attributes, rest''') <- runParser insideParseAttributes rest''
             Just ((name, value):attributes, rest''')
 
+{- | parseChildrens function
+    
+    Parse the children of a tag
+    Return a list of children or Nothing
+-}
 parseChildrens :: Parser [XMLChild]
 parseChildrens = Parser $ \str -> case str of
     [] -> Nothing
@@ -74,9 +108,18 @@ parseChildrens = Parser $ \str -> case str of
         (childrens, rest'') <- runParser parseChildrens rest'
         Just (XMLText text:childrens, rest'')
 
+{- | parseText function
+    
+    Parse a text
+    Return a String or Nothing
+-}
 parseText :: Parser String
 parseText = Parser $ \str -> runParser (parseUntilChars "<") str
 
+{-
+    Parse the end of a tag
+    Return () or Nothing
+-}
 parseEndToken :: String -> Parser ()
 parseEndToken name = Parser $ \str -> case str of
     (' ':_) -> Nothing
