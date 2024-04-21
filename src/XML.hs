@@ -130,16 +130,28 @@ parseEndToken name = Parser $ \str -> case str of
                 (True, '>':rest') -> Just ((), rest')
                 _ -> Nothing
 
+{- | printXMLValue function
+
+    Return a String containing the XML value
+-}
 printXMLValue :: XMLValue -> String
 printXMLValue (XMLValue name attributes childrens) =
     "<" ++ name ++ printAttributes attributes ++ ">" ++
     printChildrens childrens ++ "</" ++ name ++ ">"
 
+{- | printAttributes function
+
+    Return a String containing the attributes of a tag
+-}
 printAttributes :: [(String, String)] -> String
 printAttributes [] = ""
 printAttributes ((name, value):attributes) =
     " " ++ name ++ "=\"" ++ value ++ "\"" ++ printAttributes attributes
 
+{- | printChildrens function
+
+    Return a String containing the childrens of a tag
+-}
 printChildrens :: [XMLChild] -> String
 printChildrens [] = ""
 printChildrens (XMLText text:childrens) = text ++ printChildrens childrens
