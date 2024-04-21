@@ -9,6 +9,7 @@ module Launcher
     ( launchFile
 ) where
 
+import Control.Exception
 import Json (parseJsonValue, printJson)
 import JsonToDocument (jsonToDocument)
 import DocumentToJson (documentToJson)
@@ -21,10 +22,19 @@ import Config
 -}
 launchFile :: VerifiedConf -> IO ()
 launchFile conf = do
-    fileContent <- readFile (_iFile conf)
-    case runParser parseJsonValue fileContent of
-        Just (json, _) -> case jsonToDocument json of
-            Just jsonDoc -> print (printJson (documentToJson jsonDoc))
-            _ -> myError "Error: json is not a valid document"
-        _ -> myError "Error: invalid json"
+    fileContent <- getFileContents (_iFile conf)
+    case fileContent of
+        Nothing -> myError "Error: file not found"
+        Just fileContent' -> case runParser parseJsonValue fileContent' of
+            Just (json, _) -> case jsonToDocument json of
+                Just jsonDoc -> print (printJson (documentToJson jsonDoc))
+                _ -> myError "Error: json is not a valid document"
+            _ -> myError "Error: invalid json"
     return ()
+
+getFileContents :: String -> IO (Maybe String)
+getFileContents [] = return Nothing
+getFileContents path = catch (fmap Just (readFile path)) handler
+    where
+        handler :: IOException -> IO (Maybe String)
+        handler _ = return Nothing
