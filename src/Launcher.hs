@@ -13,10 +13,14 @@ import Control.Exception
 import Json (parseJsonValue, printJson, JsonValue(..))
 import JsonToDocument (jsonToDocument)
 import DocumentToJson (documentToJson)
-import ParserLib (runParser, Parser)
+import ParserLib (runParser, Parser, (<|>))
 import Config
 
-data Parsable = JSONVALUE JsonValue | XMLVALUE String --tmp XML
+data Parsable =
+    JSONVALUE JsonValue |
+    XMLVALUE String | --tmp XML
+    UNKNOWNEDVALUE Parsable
+
 
 {- | launchFile function
 
@@ -30,6 +34,11 @@ launchFile conf = do
         Just fileContent' -> launchParser conf fileContent'
     return ()
 
+parseUnknowned :: Parser Parsable
+parseUnknowned =
+    JSONVALUE <$> parseJsonValue <|>
+    XMLVALUE <$> return "tmp XML"
+
 launchParser :: VerifiedConf -> String -> IO ()
 launchParser conf fileContent = do
     parser <- chooseParser (_iFormat conf)
@@ -42,6 +51,7 @@ launchParser conf fileContent = do
 chooseParser :: Format -> IO (Parser Parsable)
 chooseParser JSON = return (JSONVALUE <$> parseJsonValue)
 chooseParser XML = return (XMLVALUE <$> return "tmp XML")
+chooseParser UNKNOWNED = return (UNKNOWNEDVALUE <$> parseUnknowned)
 chooseParser _ = myError "Error: Format Not supported"
     >> return (XMLVALUE <$> return "This will never get executed")
 
