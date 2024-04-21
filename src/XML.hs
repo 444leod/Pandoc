@@ -155,4 +155,5 @@ printAttributes ((name, value):attributes) =
 printChildrens :: [XMLChild] -> String
 printChildrens [] = ""
 printChildrens (XMLText text:childrens) = text ++ printChildrens childrens
-printChildrens (XMLNode node:childrens) = printXMLValue node ++ printChildrens childrens
+printChildrens (XMLNode node:childrens) =
+    printXMLValue node ++ printChildrens childrens
