@@ -9,7 +9,7 @@ module Main(main) where
 
 import System.Environment(getArgs)
 import Json (parseJsonValue, printJson)
-import XML (parseXMLValue)
+import XML (parseXMLValue, printXMLValue)
 import JsonToDocument (jsonToDocument)
 import DocumentToJson (documentToJson)
 import ParserLib (runParser)
@@ -33,9 +33,12 @@ main = do
 launchFile :: VerifiedConf -> IO ()
 launchFile conf = do
     fileContent <- readFile (_iFile conf)
-    case runParser parseJsonValue fileContent of
-        Just (json, _) -> case jsonToDocument json of
-            Just jsonDoc -> print (printJson (documentToJson jsonDoc))
-            _ -> myError "Error: json is not a valid document"
-        _ -> myError "Error: invalid json"
+    -- case runParser parseJsonValue fileContent of
+    --     Just (json, _) -> case jsonToDocument json of
+    --         Just jsonDoc -> print (printJson (documentToJson jsonDoc))
+    --         _ -> myError "Error: json is not a valid document"
+    --     _ -> myError "Error: invalid json"
+    case runParser parseXMLValue fileContent of
+        Just (xml, _) -> print (printXMLValue xml)
+        _ -> myError "Error: invalid xml"
     return ()

@@ -129,3 +129,18 @@ parseEndToken name = Parser $ \str -> case str of
             case (str' == name, rest) of
                 (True, '>':rest') -> Just ((), rest')
                 _ -> Nothing
+
+printXMLValue :: XMLValue -> String
+printXMLValue (XMLValue name attributes childrens) =
+    "<" ++ name ++ printAttributes attributes ++ ">" ++
+    printChildrens childrens ++ "</" ++ name ++ ">"
+
+printAttributes :: [(String, String)] -> String
+printAttributes [] = ""
+printAttributes ((name, value):attributes) =
+    " " ++ name ++ "=\"" ++ value ++ "\"" ++ printAttributes attributes
+
+printChildrens :: [XMLChild] -> String
+printChildrens [] = ""
+printChildrens (XMLText text:childrens) = text ++ printChildrens childrens
+printChildrens (XMLNode node:childrens) = printXMLValue node ++ printChildrens childrens
