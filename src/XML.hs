@@ -11,11 +11,11 @@
 module XML
     ( XMLValue(..)
     , parseXMLValue
+    , printXMLValue
 ) where
 
 import ParserLib
 
-import Debug.Trace
 
 {- | XMLValue data type
 
@@ -45,7 +45,7 @@ parseXMLValue :: Parser XMLValue
 parseXMLValue = Parser $ \str ->
     case str of
         ('<':rest) -> do
-            (name, rest') <- trace (show str) $
+            (name, rest') <-
                 runParser (expectNoSeparators " \t\n" *> parseName) rest
             (attributes, rest'') <- runParser parseAttributes rest'
             (childs, rest''') <- runParser (parseChildrens <*
