@@ -32,6 +32,11 @@ launchFile conf = do
             _ -> myError "Error: invalid json"
     return ()
 
+{- | getFileContents function
+
+    Acts as a wrapper for the readFile function
+    Return the file content if it exists, Nothing otherwise
+-}
 getFileContents :: String -> IO (Maybe String)
 getFileContents [] = return Nothing
 getFileContents path = catch (fmap Just (readFile path)) handler
