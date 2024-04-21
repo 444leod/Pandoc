@@ -10,11 +10,13 @@ module Launcher
 ) where
 
 import Control.Exception
-import Json (parseJsonValue, printJson)
+import Json (parseJsonValue, printJson, JsonValue(..))
 import JsonToDocument (jsonToDocument)
 import DocumentToJson (documentToJson)
-import ParserLib (runParser)
+import ParserLib (runParser, Parser)
 import Config
+
+data Parsable = JSONVALUE JsonValue | XMLVALUE String --tmp XML
 
 {- | launchFile function
 
@@ -25,12 +27,23 @@ launchFile conf = do
     fileContent <- getFileContents (_iFile conf)
     case fileContent of
         Nothing -> myError "Error: file not found"
-        Just fileContent' -> case runParser parseJsonValue fileContent' of
-            Just (json, _) -> case jsonToDocument json of
-                Just jsonDoc -> print (printJson (documentToJson jsonDoc))
-                _ -> myError "Error: json is not a valid document"
-            _ -> myError "Error: invalid json"
+        Just fileContent' -> launchParser conf fileContent'
     return ()
+
+launchParser :: VerifiedConf -> String -> IO ()
+launchParser conf fileContent = do
+    parser <- chooseParser (_iFormat conf)
+    case runParser parser fileContent of
+        Nothing -> myError "Error: invalid file content"
+        _ -> myError "GOOD, TMP ERROR"
+    return ()
+
+-- chooseParser :: Format -> IO (Parser a)
+chooseParser :: Format -> IO (Parser Parsable)
+chooseParser JSON = return (JSONVALUE <$> parseJsonValue)
+chooseParser XML = return (XMLVALUE <$> return "tmp XML")
+chooseParser _ = myError "Error: Format Not supported"
+    >> return (XMLVALUE <$> return "This will never get executed")
 
 {- | getFileContents function
 

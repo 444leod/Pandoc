@@ -8,6 +8,7 @@
 module Config(
     Conf(..),
     VerifiedConf(..),
+    Format(..),
     defaultConf,
     getOpts,
     validateConf,
