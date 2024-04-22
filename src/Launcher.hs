@@ -9,18 +9,21 @@ module Launcher
     ( launchFile
 ) where
 
-import Control.Exception
 import Json (parseJsonValue, printJson, JsonValue(..))
 import JsonToDocument (jsonToDocument)
-import DocumentToJson (documentToJson)
+import DocumentToJson ()
 import ParserLib (runParser, Parser, (<|>))
 import Config
+import Document
+
+import Debug.Trace
+import Control.Exception
 
 data Parsable =
     JSONVALUE JsonValue |
     XMLVALUE String | --tmp XML
-    UNKNOWNEDVALUE Parsable
-
+    ERRORVALUE String |
+    UNKNOWNEDVALUE Parsable deriving (Show)
 
 {- | launchFile function
 
@@ -44,16 +47,30 @@ launchParser conf fileContent = do
     parser <- chooseParser (_iFormat conf)
     case runParser parser fileContent of
         Nothing -> myError "Error: invalid file content"
-        _ -> myError "GOOD, TMP ERROR"
+        Just val -> do
+            maybeDoc <- convertToDocument (fst val)
+            case maybeDoc of
+                Nothing -> myError "Error: cannot convert to document"
+                Just doc -> trace (show doc) (myError "GOOD, TMP ERROR")
     return ()
 
--- chooseParser :: Format -> IO (Parser a)
-chooseParser :: Format -> IO (Parser Parsable)
+{- | chooseParser function
+
+    Return the parser based on the format
+-}
+chooseParser :: Config.Format -> IO (Parser Parsable)
 chooseParser JSON = return (JSONVALUE <$> parseJsonValue)
 chooseParser XML = return (XMLVALUE <$> return "tmp XML")
 chooseParser UNKNOWNED = return (UNKNOWNEDVALUE <$> parseUnknowned)
 chooseParser _ = myError "Error: Format Not supported"
-    >> return (XMLVALUE <$> return "This will never get executed")
+    >> return (return (ERRORVALUE "This will never get executed"))
+
+convertToDocument :: Parsable -> IO (Maybe Document)
+convertToDocument (JSONVALUE x) = return (jsonToDocument x)
+convertToDocument (XMLVALUE _) = return Nothing
+convertToDocument (UNKNOWNEDVALUE (JSONVALUE x)) = return (jsonToDocument x)
+convertToDocument (UNKNOWNEDVALUE (XMLVALUE _)) = return Nothing
+convertToDocument _ = return Nothing
 
 {- | getFileContents function
 
