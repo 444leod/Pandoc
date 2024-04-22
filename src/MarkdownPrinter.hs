@@ -37,11 +37,14 @@ printBody :: [Content] -> Int -> String
 printBody content depth = concatMap (`printContent` depth) content
 
 printContent :: Content -> Int -> String
-printContent (CParagraph (Paragraph paragraphContent)) depth =
-    printParagraph paragraphContent depth ++ "\n"
 printContent (CSection (Section title content)) depth =
     printSection title content (depth + 1)
-printContent _ _ = ""
+printContent (CParagraph (Paragraph paragraphContent)) depth =
+    printParagraph paragraphContent depth ++ "\n"
+printContent (CList list) depth = ""
+printContent (CLink link) _ = ""
+printContent (CImage image) _ = printImage image
+printContent (CCodeBlock codeBlock) _ = ""
 
 printSection :: String -> [Content] -> Int -> String
 printSection [] content depth = printBody content depth
@@ -50,11 +53,21 @@ printSection title content depth =
     printBody content depth
 
 printParagraph :: [ParagraphContent] -> Int -> String
-printParagraph content depth = concatMap (`printParagraphContent` depth) content ++ "\n"
+printParagraph content depth =
+    concatMap (`printParagraphContent` depth) content ++ "\n"
 
 printParagraphContent :: ParagraphContent -> Int -> String
-printParagraphContent (PTextFormat text) depth = printTextFormat text
-printParagraphContent _ _ = ""
+printParagraphContent (PImage image) _ = printImage image
+printParagraphContent (PTextFormat text) _ = printTextFormat text
+printParagraphContent (PLink link) _ = ""
+
+printImage :: Image -> String
+printImage image = case _imgText image of
+    FormatList imgText ->
+        "![" ++ printFormatList imgText ++ "](" ++ _imgURL image ++ ")"
+
+printFormatList :: [Format] -> String
+printFormatList = concatMap printTextFormat
 
 printTextFormat :: Format -> String
 printTextFormat (Bold text) = "**" ++ printTextFormat text ++ "**"
