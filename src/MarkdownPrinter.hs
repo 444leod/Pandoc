@@ -41,7 +41,7 @@ printContent (CSection (Section title content)) depth =
     printSection title content (depth + 1)
 printContent (CParagraph (Paragraph paragraphContent)) _ =
     printParagraph paragraphContent ++ "\n"
-printContent (CList list) _ = ""
+printContent (CList list) _ = printList list 0
 printContent (CLink link) _ = printLink link
 printContent (CImage image) _ = printImage image
 printContent (CCodeBlock codeBlock) _ = printCodeBlock codeBlock
@@ -49,7 +49,7 @@ printContent (CCodeBlock codeBlock) _ = printCodeBlock codeBlock
 printSection :: String -> [Content] -> Int -> String
 printSection [] content depth = printBody content depth
 printSection title content depth =
-    depthToHashtags depth ++ " " ++ title ++ "\n\n" ++
+    replicate depth '#' ++ " " ++ title ++ "\n\n" ++
     printBody content depth
 
 printParagraph :: [ParagraphContent] -> String
@@ -74,14 +74,23 @@ printLink link = case _linkText link of
 printCodeBlock :: CodeBlock -> String
 printCodeBlock codeBlock =
     "```\n" ++
-    printParagraphList codeBlock ++
+    subPrintCodeBlock codeBlock ++
     "```\n"
 
-printParagraphList :: CodeBlock -> String
-printParagraphList (CodeBlock paragraphs) =
+subPrintCodeBlock :: CodeBlock -> String
+subPrintCodeBlock (CodeBlock paragraphs) =
     concatMap (printParagraph . getParagraphContents) paragraphs
     where
         getParagraphContents (Paragraph contents) = contents
+
+printList :: List -> Int -> String
+printList (List listContent) depth =
+    concatMap (`printListContent` depth) listContent
+
+printListContent :: ListContent -> Int -> String
+printListContent (LParagraph (Paragraph paragraph)) depth =
+    replicate depth '\t' ++ "- " ++ printParagraph paragraph
+printListContent (SubList list) depth = printList list (depth + 1) ++ "\n"
 
 printFormatList :: [Format] -> String
 printFormatList = concatMap printTextFormat
@@ -92,5 +101,3 @@ printTextFormat (Italic text) = "*" ++ printTextFormat text ++ "*"
 printTextFormat (Code text) = "`" ++ printTextFormat text ++ "`"
 printTextFormat (FContent text) = text
 
-depthToHashtags :: Int -> String
-depthToHashtags depth = replicate depth '#'
