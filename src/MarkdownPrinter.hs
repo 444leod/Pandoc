@@ -124,6 +124,7 @@ printCodeBlock codeBlock =
     "```\n" ++
     subPrintCodeBlock codeBlock ++
     "```\n"
+
 {- | subPrintCodeBlock
 
     Gives a string representation of the inside of a
@@ -141,7 +142,7 @@ subPrintCodeBlock (CodeBlock paragraphs) =
 -}
 printList :: List -> Int -> String
 printList (List listContent) depth =
-    concatMap (`printListContent` depth) listContent
+    concatMap (`printListContent` depth) listContent ++ getNewLineByDepth depth
 
 {- | printListContent
 
@@ -150,7 +151,7 @@ printList (List listContent) depth =
 printListContent :: ListContent -> Int -> String
 printListContent (LParagraph (Paragraph paragraph)) depth =
     replicate depth '\t' ++ "- " ++ printParagraph paragraph
-printListContent (SubList list) depth = printList list (depth + 1) ++ "\n"
+printListContent (SubList list) depth = printList list (depth + 1)
 
 {- | printTextFormat
 
@@ -168,3 +169,11 @@ printTextFormat (Bold text) = "**" ++ printTextFormat text ++ "**"
 printTextFormat (Italic text) = "*" ++ printTextFormat text ++ "*"
 printTextFormat (Code text) = "`" ++ printTextFormat text ++ "`"
 printTextFormat (FContent text) = text
+
+{- | getNewLineByDepth
+
+    Utility function to get a new line based on the depth
+-}
+getNewLineByDepth :: Int -> String
+getNewLineByDepth 0 = "\n"
+getNewLineByDepth _ = ""
