@@ -11,12 +11,20 @@ module MarkdownPrinter (
 
 import Document
 
+{- | printMarkdown
+
+    Gives a string representation of a document in markdown format
+-}
 printMarkdown :: Document -> String
 printMarkdown doc = case _body doc of
   Body contents ->
     printHeader (_header doc) ++ "\n" ++
     printBody contents 0
 
+{- | printHeader
+
+    Gives a string representation of a header in markdown format
+-}
 printHeader :: Header -> String
 printHeader header =
     "---\n" ++
@@ -25,17 +33,33 @@ printHeader header =
     printDate (_date header) ++
     "---\n"
 
+{- | printAuthor
+
+    Gives a string representation of an author in markdown format
+-}
 printAuthor :: Maybe String -> String
 printAuthor Nothing = ""
 printAuthor (Just author) = "author: " ++ author ++ "\n"
 
+{- | printDate
+
+    Gives a string representation of a date in markdown format
+-}
 printDate :: Maybe String -> String
 printDate Nothing = ""
 printDate (Just date) = "date: " ++ date ++ "\n"
 
+{- | printBody
+
+    Gives a string representation of a body in markdown format
+-}
 printBody :: [Content] -> Int -> String
 printBody content depth = concatMap (`printContent` depth) content
 
+{- | printContent
+
+    Gives a string representation of a content in markdown format
+-}
 printContent :: Content -> Int -> String
 printContent (CSection (Section title content)) depth =
     printSection title content (depth + 1)
@@ -46,58 +70,101 @@ printContent (CLink link) _ = printLink link
 printContent (CImage image) _ = printImage image
 printContent (CCodeBlock codeBlock) _ = printCodeBlock codeBlock
 
+{- | printSection
+
+    Gives a string representation of a section in markdown format
+-}
 printSection :: String -> [Content] -> Int -> String
 printSection [] content depth = printBody content depth
 printSection title content depth =
     replicate depth '#' ++ " " ++ title ++ "\n\n" ++
     printBody content depth
 
+{- | printParagraph
+
+    Gives a string representation of a paragraph in markdown format
+-}
 printParagraph :: [ParagraphContent] -> String
 printParagraph content =
     concatMap printParagraphContent content ++ "\n"
 
+{- | printParagraphContent
+
+    Gives a string representation of a paragraph content in markdown format
+-}
 printParagraphContent :: ParagraphContent -> String
 printParagraphContent (PImage image) = printImage image
 printParagraphContent (PTextFormat text) = printTextFormat text
 printParagraphContent (PLink link) = printLink link
 
+{- | printImage
+
+    Gives a string representation of an image in markdown format
+-}
 printImage :: Image -> String
 printImage image = case _imgText image of
     FormatList imgText ->
         "![" ++ printFormatList imgText ++ "](" ++ _imgURL image ++ ")"
 
+{- | printLink
+
+    Gives a string representation of a link in markdown format
+-}
 printLink :: Link -> String
 printLink link = case _linkText link of
     FormatList linkText ->
         "[" ++ printFormatList linkText ++ "](" ++ _linkURL link ++ ")"
 
+{- | printCodeBlock
+
+    Gives a string representation of a code block in markdown format
+-}
 printCodeBlock :: CodeBlock -> String
 printCodeBlock codeBlock =
     "```\n" ++
     subPrintCodeBlock codeBlock ++
     "```\n"
+{- | subPrintCodeBlock
 
+    Gives a string representation of the inside of a
+    code block in markdown format
+-}
 subPrintCodeBlock :: CodeBlock -> String
 subPrintCodeBlock (CodeBlock paragraphs) =
     concatMap (printParagraph . getParagraphContents) paragraphs
     where
         getParagraphContents (Paragraph contents) = contents
 
+{- | printList
+    
+    Gives a string representation of a list in markdown format
+-}
 printList :: List -> Int -> String
 printList (List listContent) depth =
     concatMap (`printListContent` depth) listContent
 
+{- | printListContent
+
+    Gives a string representation of a list content in markdown format
+-}
 printListContent :: ListContent -> Int -> String
 printListContent (LParagraph (Paragraph paragraph)) depth =
     replicate depth '\t' ++ "- " ++ printParagraph paragraph
 printListContent (SubList list) depth = printList list (depth + 1) ++ "\n"
 
+{- | printTextFormat
+
+    Gives a string representation of a text format in markdown format
+-}
 printFormatList :: [Format] -> String
 printFormatList = concatMap printTextFormat
 
+{- | printTextFormat
+
+    Gives a string representation of a text format in markdown format
+-}
 printTextFormat :: Format -> String
 printTextFormat (Bold text) = "**" ++ printTextFormat text ++ "**"
 printTextFormat (Italic text) = "*" ++ printTextFormat text ++ "*"
 printTextFormat (Code text) = "`" ++ printTextFormat text ++ "`"
 printTextFormat (FContent text) = text
-
