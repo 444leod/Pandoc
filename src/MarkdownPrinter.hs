@@ -44,7 +44,7 @@ printContent (CParagraph (Paragraph paragraphContent)) _ =
 printContent (CList list) _ = ""
 printContent (CLink link) _ = printLink link
 printContent (CImage image) _ = printImage image
-printContent (CCodeBlock codeBlock) _ = ""
+printContent (CCodeBlock codeBlock) _ = printCodeBlock codeBlock
 
 printSection :: String -> [Content] -> Int -> String
 printSection [] content depth = printBody content depth
@@ -70,6 +70,18 @@ printLink :: Link -> String
 printLink link = case _linkText link of
     FormatList linkText ->
         "[" ++ printFormatList linkText ++ "](" ++ _linkURL link ++ ")"
+
+printCodeBlock :: CodeBlock -> String
+printCodeBlock codeBlock =
+    "```\n" ++
+    printParagraphList codeBlock ++
+    "```\n"
+
+printParagraphList :: CodeBlock -> String
+printParagraphList (CodeBlock paragraphs) =
+    concatMap (printParagraph . getParagraphContents) paragraphs
+    where
+        getParagraphContents (Paragraph contents) = contents
 
 printFormatList :: [Format] -> String
 printFormatList = concatMap printTextFormat
