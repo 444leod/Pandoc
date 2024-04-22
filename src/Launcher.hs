@@ -37,22 +37,21 @@ launchFile conf = do
         Just fileContent' -> launchParser conf fileContent'
     return ()
 
-parseUnknowned :: Parser Parsable
-parseUnknowned =
-    JSONVALUE <$> parseJsonValue <|>
-    XMLVALUE <$> return "tmp XML"
-
 launchParser :: VerifiedConf -> String -> IO ()
 launchParser conf fileContent = do
     parser <- chooseParser (_iFormat conf)
     case runParser parser fileContent of
         Nothing -> myError "Error: invalid file content"
-        Just val -> do
-            maybeDoc <- convertToDocument (fst val)
-            case maybeDoc of
-                Nothing -> myError "Error: cannot convert to document"
-                Just doc -> trace (show doc) (myError "GOOD, TMP ERROR")
+        Just val -> launchDocument conf (fst val)
     return ()
+
+launchDocument :: VerifiedConf -> Parsable -> IO ()
+launchDocument conf parsable = do
+    maybeDoc <- convertToDocument parsable
+    case maybeDoc of
+        Nothing -> myError "Error: cannot convert to document"
+        Just doc -> trace (show doc) (myError "GOOD, TMP ERROR") 
+
 
 {- | chooseParser function
 
@@ -64,6 +63,11 @@ chooseParser XML = return (XMLVALUE <$> return "tmp XML")
 chooseParser UNKNOWNED = return (UNKNOWNEDVALUE <$> parseUnknowned)
 chooseParser _ = myError "Error: Format Not supported"
     >> return (return (ERRORVALUE "This will never get executed"))
+
+parseUnknowned :: Parser Parsable
+parseUnknowned =
+    JSONVALUE <$> parseJsonValue <|>
+    XMLVALUE <$> return "tmp XML"
 
 convertToDocument :: Parsable -> IO (Maybe Document)
 convertToDocument (JSONVALUE x) = return (jsonToDocument x)
