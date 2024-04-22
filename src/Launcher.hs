@@ -10,18 +10,19 @@ module Launcher
 ) where
 
 import Json (parseJsonValue, printJson, JsonValue(..))
+import XML (parseXMLValue, printXML, XMLValue(..))
 import JsonToDocument (jsonToDocument)
 import DocumentToJson (documentToJson)
 import ParserLib (runParser, Parser, (<|>))
 import Config
 import Document
 
-import Debug.Trace
 import Control.Exception
+import Debug.Trace
 
 data Parsable =
     JSONVALUE JsonValue |
-    XMLVALUE String | --tmp XML
+    XMLVALUE XMLValue | --tmp XML
     ERRORVALUE String |
     UNKNOWNEDVALUE Parsable deriving (Show)
 
@@ -42,7 +43,7 @@ launchParser conf fileContent = do
     parser <- chooseParser (_iFormat conf)
     case runParser parser fileContent of
         Nothing -> myError "Error: invalid file content"
-        Just val -> launchDocument conf (fst val)
+        Just val -> trace (show(fst val)) (launchDocument conf (fst val))
     return ()
 
 launchDocument :: VerifiedConf -> Parsable -> IO ()
@@ -54,8 +55,8 @@ launchDocument conf parsable = do
 
 launchPrinter :: Config.Format -> String -> Document -> IO ()
 launchPrinter JSON outfile doc = print (printJson (documentToJson doc))
-launchPrinter XML outfile doc = return ()
-launchPrinter MARKDOWN outfile doc = return ()
+launchPrinter XML outfile doc = print "XML PRINT IS NOT IMPLEMENTED YET"
+launchPrinter MARKDOWN outfile doc = print "MD PRINT IS NOT IMPLEMENTED YET"
 launchPrinter _ outfile doc = myError "Error: Output type is not supported"
 
 {- | chooseParser function
@@ -64,7 +65,7 @@ launchPrinter _ outfile doc = myError "Error: Output type is not supported"
 -}
 chooseParser :: Config.Format -> IO (Parser Parsable)
 chooseParser JSON = return (JSONVALUE <$> parseJsonValue)
-chooseParser XML = return (XMLVALUE <$> return "tmp XML")
+chooseParser XML = return (XMLVALUE <$> parseXMLValue)
 chooseParser UNKNOWNED = return (UNKNOWNEDVALUE <$> parseUnknowned)
 chooseParser _ = myError "Error: Format Not supported"
     >> return (return (ERRORVALUE "This will never get executed"))
@@ -72,7 +73,7 @@ chooseParser _ = myError "Error: Format Not supported"
 parseUnknowned :: Parser Parsable
 parseUnknowned =
     JSONVALUE <$> parseJsonValue <|>
-    XMLVALUE <$> return "tmp XML"
+    XMLVALUE <$> parseXMLValue
 
 convertToDocument :: Parsable -> IO (Maybe Document)
 convertToDocument (JSONVALUE x) = return (jsonToDocument x)
