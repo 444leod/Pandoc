@@ -11,6 +11,7 @@
 module XML
     ( XMLValue(..)
     , parseXMLValue
+    , printXMLValue
 ) where
 
 import ParserLib
