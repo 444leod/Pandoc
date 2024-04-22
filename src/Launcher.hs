@@ -11,7 +11,7 @@ module Launcher
 
 import Json (parseJsonValue, printJson, JsonValue(..))
 import JsonToDocument (jsonToDocument)
-import DocumentToJson ()
+import DocumentToJson (documentToJson)
 import ParserLib (runParser, Parser, (<|>))
 import Config
 import Document
@@ -50,8 +50,13 @@ launchDocument conf parsable = do
     maybeDoc <- convertToDocument parsable
     case maybeDoc of
         Nothing -> myError "Error: cannot convert to document"
-        Just doc -> trace (show doc) (myError "GOOD, TMP ERROR") 
+        Just doc -> launchPrinter (_oFormat conf) (_iFile conf) doc
 
+launchPrinter :: Config.Format -> String -> Document -> IO ()
+launchPrinter JSON outfile doc = print (printJson (documentToJson doc))
+launchPrinter XML outfile doc = return ()
+launchPrinter MARKDOWN outfile doc = return ()
+launchPrinter _ outfile doc = myError "Error: Output type is not supported"
 
 {- | chooseParser function
 
