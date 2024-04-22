@@ -11,7 +11,7 @@
 module XML
     ( XMLValue(..)
     , parseXMLValue
-    , printXMLValue
+    , printXML
 ) where
 
 import ParserLib
@@ -130,12 +130,12 @@ parseEndToken name = Parser $ \str -> case str of
                 (True, '>':rest') -> Just ((), rest')
                 _ -> Nothing
 
-{- | printXMLValue function
+{- | printXML function
 
     Return a String containing the XML value
 -}
-printXMLValue :: XMLValue -> String
-printXMLValue (XMLValue name attributes childrens) =
+printXML :: XMLValue -> String
+printXML (XMLValue name attributes childrens) =
     "<" ++ name ++ printAttributes attributes ++ ">" ++
     printChildrens childrens ++ "</" ++ name ++ ">"
 
@@ -156,4 +156,4 @@ printChildrens :: [XMLChild] -> String
 printChildrens [] = ""
 printChildrens (XMLText text:childrens) = text ++ printChildrens childrens
 printChildrens (XMLNode node:childrens) =
-    printXMLValue node ++ printChildrens childrens
+    printXML node ++ printChildrens childrens

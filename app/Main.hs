@@ -8,13 +8,8 @@
 module Main(main) where
 
 import System.Environment(getArgs)
-import Json (parseJsonValue, printJson)
-import XML (parseXMLValue)
-import JsonToDocument (jsonToDocument)
-import DocumentToJson (documentToJson)
-import ParserLib (runParser)
-import MarkdownPrinter (printMarkdown)
 import Config
+import Launcher(launchFile)
 
 main :: IO ()
 main = do
@@ -25,18 +20,3 @@ main = do
     case option of
         Just opt -> launchFile (createVerifiedConf opt)
         Nothing -> myError "Error: invalid arguments"
-
--- TMP Function, needs rework
-{- | launchFile function
-
-    Read a file, parses it as a json, and print it as a json
--}
-launchFile :: VerifiedConf -> IO ()
-launchFile conf = do
-    fileContent <- readFile (_iFile conf)
-    case runParser parseJsonValue fileContent of
-        Just (json, _) -> case jsonToDocument json of
-            Just jsonDoc -> print (printMarkdown jsonDoc)
-            _ -> myError "Error: json is not a valid document"
-        _ -> myError "Error: invalid json"
-    return ()
