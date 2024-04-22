@@ -1,0 +1,68 @@
+#!/usr/bin/env python3
+
+##
+## EPITECH PROJECT, 2024
+## Pandoc
+## File description:
+## funcTest
+##
+
+import unittest
+import subprocess
+
+def run_pandoc_with_args(args):
+    process = subprocess.run(['./mypandoc'] + args, capture_output=True, text=True)
+    return process.stdout, process.stderr, process.returncode
+
+class CommandLineArgs(unittest.TestCase):
+
+    def test_json_to_markdown(self):
+        stdout, stderr, returncode = run_pandoc_with_args(['-i', 'tests/testFiles/rightJSONFile.json', '-f', 'markdown'])
+        with open('tests/testFiles/rightMDFile.md', 'r') as f:
+            expected_output = f.read()
+        self.assertEqual(returncode, 0)
+        self.assertEqual(stderr, '')
+        self.assertEqual(stdout, expected_output)
+
+    def test_json_to_xml(self):
+        stdout, stderr, returncode = run_pandoc_with_args(['-i', 'tests/testFiles/rightJSONFile.json', '-f', 'xml'])
+        with open('tests/testFiles/rightXMLFile.xml', 'r') as f:
+            expected_output = f.read()
+        self.assertEqual(returncode, 0)
+        self.assertEqual(stderr, '')
+        self.assertEqual(stdout, expected_output)
+
+    def test_markdown_to_json(self):
+        stdout, stderr, returncode = run_pandoc_with_args(['-i', 'tests/testFiles/rightMDFile.md', '-f', 'json'])
+        with open('tests/testFiles/rightJSONFile.json', 'r') as f:
+            expected_output = f.read()
+        self.assertEqual(returncode, 0)
+        self.assertEqual(stderr, '')
+        self.assertEqual(stdout, expected_output)
+
+    def test_markdown_to_xml(self):
+        stdout, stderr, returncode = run_pandoc_with_args(['-i', 'tests/testFiles/rightMDFile.md', '-f', 'xml'])
+        with open('tests/testFiles/rightXMLFile.xml', 'r') as f:
+            expected_output = f.read()
+        self.assertEqual(returncode, 0)
+        self.assertEqual(stderr, '')
+        self.assertEqual(stdout, expected_output)
+
+    def test_xml_to_json(self):
+        stdout, stderr, returncode = run_pandoc_with_args(['-i', 'tests/testFiles/rightXMLFile.xml', '-f', 'json'])
+        with open('tests/testFiles/rightJSONFile.json', 'r') as f:
+            expected_output = f.read()
+        self.assertEqual(returncode, 0)
+        self.assertEqual(stderr, '')
+        self.assertEqual(stdout, expected_output)
+
+    def test_xml_to_markdown(self):
+        stdout, stderr, returncode = run_pandoc_with_args(['-i', 'tests/testFiles/rightXMLFile.xml', '-f', 'markdown'])
+        with open('tests/testFiles/rightMDFile.md', 'r') as f:
+            expected_output = f.read()
+        self.assertEqual(returncode, 0)
+        self.assertEqual(stderr, '')
+        self.assertEqual(stdout, expected_output)
+
+if __name__ == '__main__':
+    unittest.main(verbosity=2)
