@@ -2,16 +2,16 @@
 -- EPITECH PROJECT, 2024
 -- FUNCTIONNAL
 -- File description:
--- Spec
+-- Tester
 -}
 
 import Test.HUnit
 import Text.Printf
+import ConfigSuite (configSuite)
 
 main :: IO ()
 main = do
-    tests <- testList
-    (c, _) <- runTestText (putErrors $ testCaseCount tests) tests
+    (c, _) <- runTestText (putErrors $ testCaseCount testList) testList
     putCounts c
 
 putErrors :: Int -> PutText Int
@@ -33,7 +33,5 @@ putCounts (Counts _ tries fails errs) =
     printf "\ESC[0mOut of %d tests\n" tries
     where success = tries - (fails + errs)
 
-testList :: IO Test
-testList = do
-    return $ TestList [
-        ]
+testList :: Test
+testList = TestList [configSuite]
