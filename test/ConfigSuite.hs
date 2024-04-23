@@ -24,12 +24,12 @@ getOptsEmptyDefault = TestCase $ assertEqual "getOpts []"
 getOptsEmptyCustom :: Test
 getOptsEmptyCustom = TestCase $ assertEqual "getOpts []"
     (Just conf) (getOpts conf [])
-    where conf = (Conf (Just "aaa") (Just XML) (Just "bbb") (Just JSON))
+    where conf = Conf (Just "aaa") (Just XML) (Just "bbb") (Just JSON)
 
 getOptsIFile :: Test
 getOptsIFile = TestCase $ assertEqual "getOpts -i file"
     (Just conf) (getOpts defaultConf ["-i", "file"])
-    where conf = (Conf (Just "file") Nothing Nothing (Just UNKNOWNED))
+    where conf = Conf (Just "file") Nothing Nothing (Just UNKNOWNED)
 
 getOptsIFileEmpty :: Test
 getOptsIFileEmpty = TestCase $ assertEqual "getOpts -i"
@@ -38,7 +38,7 @@ getOptsIFileEmpty = TestCase $ assertEqual "getOpts -i"
 getOptsOFile :: Test
 getOptsOFile = TestCase $ assertEqual "getOpts -o file"
     (Just conf) (getOpts defaultConf ["-o", "file"])
-    where conf = (Conf Nothing Nothing (Just "file") (Just UNKNOWNED))
+    where conf = Conf Nothing Nothing (Just "file") (Just UNKNOWNED)
 
 getOptsOFileEmpty :: Test
 getOptsOFileEmpty = TestCase $ assertEqual "getOpts -o"
@@ -47,7 +47,7 @@ getOptsOFileEmpty = TestCase $ assertEqual "getOpts -o"
 getOptsIFormat :: Test
 getOptsIFormat = TestCase $ assertEqual "getOpts -e xml"
     (Just conf) (getOpts defaultConf ["-e", "xml"])
-    where conf = (Conf Nothing Nothing Nothing (Just XML))
+    where conf = Conf Nothing Nothing Nothing (Just XML)
 
 getOptsIFormatEmpty :: Test
 getOptsIFormatEmpty = TestCase $ assertEqual "getOpts -e"
@@ -55,12 +55,12 @@ getOptsIFormatEmpty = TestCase $ assertEqual "getOpts -e"
 
 getOptsIFormatBad :: Test
 getOptsIFormatBad = TestCase $ assertEqual "getOpts -f house"
-    Nothing (getOpts defaultConf ["-f", "house"])
+    Nothing (getOpts defaultConf ["-e", "house"])
 
 getOptsOFormat :: Test
 getOptsOFormat = TestCase $ assertEqual "getOpts -f json"
     (Just conf) (getOpts defaultConf ["-f", "json"])
-    where conf = (Conf Nothing (Just JSON) Nothing (Just UNKNOWNED))
+    where conf = Conf Nothing (Just JSON) Nothing (Just UNKNOWNED)
 
 getOptsOFormatEmpty :: Test
 getOptsOFormatEmpty = TestCase $ assertEqual "getOpts -f"
@@ -69,6 +69,24 @@ getOptsOFormatEmpty = TestCase $ assertEqual "getOpts -f"
 getOptsOFormatBad :: Test
 getOptsOFormatBad = TestCase $ assertEqual "getOpts -f car"
     Nothing (getOpts defaultConf ["-f", "car"])
+
+getOptsMany1 :: Test
+getOptsMany1 = TestCase $ assertEqual "getOpts -i in -f md -o out"
+    (Just c) (getOpts defaultConf ["-i", "in", "-o", "out", "-f", "markdown"])
+    where c = Conf (Just "in") (Just MARKDOWN) (Just "out") (Just UNKNOWNED)
+
+getOptsMany2 :: Test
+getOptsMany2 = TestCase $ assertEqual "getOpts -i in -i huh -i car"
+    conf (getOpts defaultConf ["-i", "in", "-i", "huh", "-i", "car"])
+    where conf = Just (Conf (Just "car") Nothing Nothing (Just UNKNOWNED))
+
+getOptsMany3 :: Test
+getOptsMany3 = TestCase $ assertEqual "getOpts -i -e -f -o -i"
+    Nothing (getOpts defaultConf ["-i", "-e", "-f", "-o", "-i"])
+
+getOptsMany4 :: Test
+getOptsMany4 = TestCase $ assertEqual "getOpts -f car -i car"
+    Nothing (getOpts defaultConf ["-i", "-e", "-f", "-o", "-i"])
 
 getOptsSuite :: Test
 getOptsSuite = TestList [
@@ -85,7 +103,12 @@ getOptsSuite = TestList [
         TestLabel "getOpts iFormat bad" getOptsIFormatBad,
         TestLabel "getOpts oFormat + default" getOptsOFormat,
         TestLabel "getOpts oFormat empty" getOptsOFormatEmpty,
-        TestLabel "getOpts oFormat bad" getOptsOFormatBad
+        TestLabel "getOpts oFormat bad" getOptsOFormatBad,
+
+        TestLabel "gotOpts many args I" getOptsMany1,
+        TestLabel "gotOpts many args II" getOptsMany2,
+        TestLabel "gotOpts many args III" getOptsMany3,
+        TestLabel "gotOpts many args IV" getOptsMany4
         ]
 
 configSuite :: Test
