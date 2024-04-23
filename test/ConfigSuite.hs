@@ -53,6 +53,10 @@ getOptsIFormatEmpty :: Test
 getOptsIFormatEmpty = TestCase $ assertEqual "getOpts -e"
     Nothing (getOpts defaultConf ["-e"])
 
+getOptsIFormatBad :: Test
+getOptsIFormatBad = TestCase $ assertEqual "getOpts -f house"
+    Nothing (getOpts defaultConf ["-f", "house"])
+
 getOptsOFormat :: Test
 getOptsOFormat = TestCase $ assertEqual "getOpts -f json"
     (Just conf) (getOpts defaultConf ["-f", "json"])
@@ -61,6 +65,10 @@ getOptsOFormat = TestCase $ assertEqual "getOpts -f json"
 getOptsOFormatEmpty :: Test
 getOptsOFormatEmpty = TestCase $ assertEqual "getOpts -f"
     Nothing (getOpts defaultConf ["-f"])
+
+getOptsOFormatBad :: Test
+getOptsOFormatBad = TestCase $ assertEqual "getOpts -f car"
+    Nothing (getOpts defaultConf ["-f", "car"])
 
 getOptsSuite :: Test
 getOptsSuite = TestList [
@@ -74,8 +82,10 @@ getOptsSuite = TestList [
 
         TestLabel "getOpts iFormat + default" getOptsIFormat,
         TestLabel "getOpts iFormat empty" getOptsIFormatEmpty,
+        TestLabel "getOpts iFormat bad" getOptsIFormatBad,
         TestLabel "getOpts oFormat + default" getOptsOFormat,
-        TestLabel "getOpts oFormat empty" getOptsOFormatEmpty
+        TestLabel "getOpts oFormat empty" getOptsOFormatEmpty,
+        TestLabel "getOpts oFormat bad" getOptsOFormatBad
         ]
 
 configSuite :: Test
