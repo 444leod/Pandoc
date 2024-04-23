@@ -72,13 +72,13 @@ launchDocument conf parsable = do
     Print the document based on the format
 -}
 launchPrinter :: ConfFormat -> String -> Document -> IO ()
-launchPrinter JSON "" doc = print (printJson (documentToJson doc))
+launchPrinter JSON "" doc = putStrLn (printJson (documentToJson doc))
 launchPrinter JSON outfile doc =
     writeFile outfile (printJson (documentToJson doc))
-launchPrinter XML "" _ = print "XML PRINT IS NOT IMPLEMENTED YET"
+launchPrinter XML "" _ = putStrLn "XML PRINT IS NOT IMPLEMENTED YET"
 launchPrinter XML outfile _ =
     writeFile outfile "XML PRINT IS NOT IMPLEMENTED YET"
-launchPrinter MARKDOWN "" doc = print (printMarkdown doc)
+launchPrinter MARKDOWN "" doc = putStrLn (printMarkdown doc)
 launchPrinter MARKDOWN outfile doc = writeFile outfile (printMarkdown doc)
 launchPrinter _ _ _ = myError "Error: Output type is not supported"
 
