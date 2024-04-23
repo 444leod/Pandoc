@@ -8,7 +8,7 @@
 module Config(
     Conf(..),
     VerifiedConf(..),
-    Format(..),
+    ConfFormat(..),
     defaultConf,
     getOpts,
     validateConf,
@@ -21,7 +21,7 @@ import System.Exit(exitWith, ExitCode(ExitFailure))
 import System.IO (hPutStrLn, hPutStr, stderr)
 
 import Debug.Trace
-data Format = JSON | XML | MARKDOWN | UNKNOWN deriving (Enum, Show)
+data ConfFormat = JSON | XML | MARKDOWN | UNKNOWN deriving (Enum, Show)
 
 {-  | Conf data
 
@@ -29,9 +29,9 @@ data Format = JSON | XML | MARKDOWN | UNKNOWN deriving (Enum, Show)
 -}
 data Conf = Conf {
     iFile :: Maybe String,
-    oFormat :: Maybe Format,
+    oFormat :: Maybe ConfFormat,
     oFile :: Maybe String,
-    iFormat :: Maybe Format
+    iFormat :: Maybe ConfFormat
 } deriving (Show)
 
 {-  | VerifiedConf data
@@ -40,9 +40,9 @@ data Conf = Conf {
 -}
 data VerifiedConf = VerifiedConf {
     _iFile :: String,
-    _oFormat :: Format,
+    _oFormat :: ConfFormat,
     _oFile :: String,
-    _iFormat :: Format
+    _iFormat :: ConfFormat
 } deriving (Show)
 
 -- Private functions
@@ -82,7 +82,7 @@ defaultConf = Conf {
 
     Return Just the format if it is valid, Nothing otherwise
 -}
-getFormat :: String -> Maybe Format
+getFormat :: String -> Maybe ConfFormat
 getFormat "json" = Just JSON
 getFormat "xml" = Just XML
 getFormat "markdown" = Just MARKDOWN

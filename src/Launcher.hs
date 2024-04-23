@@ -71,7 +71,7 @@ launchDocument conf parsable = do
 
     Print the document based on the format
 -}
-launchPrinter :: Config.Format -> String -> Document -> IO ()
+launchPrinter :: ConfFormat -> String -> Document -> IO ()
 launchPrinter JSON "" doc = print (printJson (documentToJson doc))
 launchPrinter JSON outfile doc =
     writeFile outfile (printJson (documentToJson doc))
@@ -86,7 +86,7 @@ launchPrinter _ _ _ = myError "Error: Output type is not supported"
 
     Return the parser based on the format
 -}
-chooseParser :: Config.Format -> IO (Parser Parsable)
+chooseParser :: ConfFormat -> IO (Parser Parsable)
 chooseParser JSON = return (JSONVALUE <$> parseJsonValue)
 chooseParser XML = return (XMLVALUE <$> parseXMLValue)
 chooseParser UNKNOWN = return (UNKNOWNVALUE <$> parseUnknown)
