@@ -128,6 +128,10 @@ getFileContents path = catch (fmap Just (readFile path)) handler
         handler :: IOException -> IO (Maybe String)
         handler _ = return Nothing
 
+{- | writeFileContents function
+
+    Acts as a wrapper for the writeFile function
+-}
 writeFileContents :: String -> String -> IO ()
 writeFileContents outfile content = catch (writeFile outfile content) handler
     where
