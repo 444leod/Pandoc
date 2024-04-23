@@ -8,7 +8,7 @@
 module Config(
     Conf(..),
     VerifiedConf(..),
-    Format(..),
+    ConfFormat(..),
     defaultConf,
     getOpts,
     validateConf,
@@ -20,7 +20,8 @@ import Data.Maybe(fromMaybe)
 import System.Exit(exitWith, ExitCode(ExitFailure))
 import System.IO (hPutStrLn, hPutStr, stderr)
 
-data Format = JSON | XML | MARKDOWN | UNKNOWNED deriving (Enum, Show)
+import Debug.Trace
+data ConfFormat = JSON | XML | MARKDOWN | UNKNOWN deriving (Enum, Show)
 
 {-  | Conf data
 
@@ -28,9 +29,9 @@ data Format = JSON | XML | MARKDOWN | UNKNOWNED deriving (Enum, Show)
 -}
 data Conf = Conf {
     iFile :: Maybe String,
-    oFormat :: Maybe Format,
+    oFormat :: Maybe ConfFormat,
     oFile :: Maybe String,
-    iFormat :: Maybe Format
+    iFormat :: Maybe ConfFormat
 } deriving (Show)
 
 {-  | VerifiedConf data
@@ -39,9 +40,9 @@ data Conf = Conf {
 -}
 data VerifiedConf = VerifiedConf {
     _iFile :: String,
-    _oFormat :: Format,
+    _oFormat :: ConfFormat,
     _oFile :: String,
-    _iFormat :: Format
+    _iFormat :: ConfFormat
 } deriving (Show)
 
 -- Private functions
@@ -72,7 +73,7 @@ defaultConf = Conf {
     iFile = Nothing,
     oFormat = Nothing,
     oFile = Nothing,
-    iFormat = Just UNKNOWNED
+    iFormat = Just UNKNOWN
 }
 
 {- | getFormat function
@@ -81,7 +82,7 @@ defaultConf = Conf {
 
     Return Just the format if it is valid, Nothing otherwise
 -}
-getFormat :: String -> Maybe Format
+getFormat :: String -> Maybe ConfFormat
 getFormat "json" = Just JSON
 getFormat "xml" = Just XML
 getFormat "markdown" = Just MARKDOWN
@@ -95,10 +96,12 @@ getFormat _ = Nothing
 -}
 getOpts :: Conf -> [String] -> Maybe Conf
 getOpts conf [] = Just conf
+getOpts conf ("-i":"\"\"":xs) = getOpts conf{iFile = Just "\0"} xs
 getOpts conf ("-i":x:xs) = getOpts conf{iFile = Just x} xs
 getOpts conf ("-f": x:xs) = case getFormat x of
     Nothing -> Nothing
     Just format -> getOpts conf{oFormat = Just format} xs
+getOpts conf ("-o":"":xs) = getOpts conf{oFile = Just "\0"} xs
 getOpts conf ("-o": x:xs) = getOpts conf{oFile = Just x} xs
 getOpts conf ("-e": x:xs) = case getFormat x of
     Nothing -> Nothing
@@ -126,7 +129,7 @@ validateConf _ = return ()
 createVerifiedConf :: Conf -> VerifiedConf
 createVerifiedConf conf = VerifiedConf {
     _iFile = fromMaybe "" (iFile conf),
-    _oFormat = fromMaybe UNKNOWNED (oFormat conf),
+    _oFormat = fromMaybe UNKNOWN (oFormat conf),
     _oFile = fromMaybe "" (oFile conf),
-    _iFormat = fromMaybe UNKNOWNED (iFormat conf)
+    _iFormat = fromMaybe UNKNOWN (iFormat conf)
 }
