@@ -20,7 +20,7 @@ import Data.Maybe(fromMaybe)
 import System.Exit(exitWith, ExitCode(ExitFailure))
 import System.IO (hPutStrLn, hPutStr, stderr)
 
-data Format = JSON | XML | MARKDOWN | UNKNOWNED deriving (Enum, Show)
+data Format = JSON | XML | MARKDOWN | UNKNOWNED deriving (Enum, Show, Eq)
 
 {-  | Conf data
 
@@ -32,6 +32,21 @@ data Conf = Conf {
     oFile :: Maybe String,
     iFormat :: Maybe Format
 } deriving (Show)
+
+instance Eq Conf where
+    (==) (Conf Nothing _ _ _) (Conf (Just _) _ _ _) = False
+    (==) (Conf (Just _) _ _ _) (Conf Nothing _ _ _) = False
+
+    (==) (Conf _ Nothing _ _) (Conf _ (Just _) _ _) = False
+    (==) (Conf _ (Just _) _ _) (Conf _ Nothing _ _) = False
+
+    (==) (Conf _ _ Nothing _) (Conf _ _ (Just _) _) = False
+    (==) (Conf _ _ (Just _) _) (Conf _ _ Nothing _) = False
+
+    (==) (Conf _ _ _ Nothing) (Conf _ _ _ (Just _)) = False
+    (==) (Conf _ _ _ (Just _)) (Conf _ _ _ Nothing) = False
+
+    (==) (Conf _ _ _ _) (Conf _ _ _ _) = True -- remove warnings.
 
 {-  | VerifiedConf data
 
