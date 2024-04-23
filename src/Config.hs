@@ -33,20 +33,15 @@ data Conf = Conf {
     iFormat :: Maybe Format
 } deriving (Show)
 
+eqMaybe :: Eq a => Maybe a -> Maybe a -> Bool
+eqMaybe Nothing Nothing = True
+eqMaybe (Just _) Nothing = False
+eqMaybe Nothing (Just _) = False
+eqMaybe (Just x) (Just y) = x == y
+
 instance Eq Conf where
-    (==) (Conf Nothing _ _ _) (Conf (Just _) _ _ _) = False
-    (==) (Conf (Just _) _ _ _) (Conf Nothing _ _ _) = False
-
-    (==) (Conf _ Nothing _ _) (Conf _ (Just _) _ _) = False
-    (==) (Conf _ (Just _) _ _) (Conf _ Nothing _ _) = False
-
-    (==) (Conf _ _ Nothing _) (Conf _ _ (Just _) _) = False
-    (==) (Conf _ _ (Just _) _) (Conf _ _ Nothing _) = False
-
-    (==) (Conf _ _ _ Nothing) (Conf _ _ _ (Just _)) = False
-    (==) (Conf _ _ _ (Just _)) (Conf _ _ _ Nothing) = False
-
-    (==) (Conf _ _ _ _) (Conf _ _ _ _) = True -- remove warnings.
+    (==) (Conf a b c d) (Conf w x y z) =
+        a `eqMaybe` w && b `eqMaybe` x && c `eqMaybe` y && d `eqMaybe` z
 
 {-  | VerifiedConf data
 
