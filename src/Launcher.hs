@@ -74,12 +74,13 @@ launchDocument conf parsable = do
 launchPrinter :: ConfFormat -> String -> Document -> IO ()
 launchPrinter JSON "" doc = putStrLn (printJson (documentToJson doc))
 launchPrinter JSON outfile doc =
-    writeFile outfile (printJson (documentToJson doc))
+    writeFileContents outfile (printJson (documentToJson doc))
 launchPrinter XML "" _ = putStrLn "XML PRINT IS NOT IMPLEMENTED YET"
 launchPrinter XML outfile _ =
-    writeFile outfile "XML PRINT IS NOT IMPLEMENTED YET"
+    writeFileContents outfile "XML PRINT IS NOT IMPLEMENTED YET"
 launchPrinter MARKDOWN "" doc = putStrLn (printMarkdown doc)
-launchPrinter MARKDOWN outfile doc = writeFile outfile (printMarkdown doc)
+launchPrinter MARKDOWN outfile doc =
+    writeFileContents outfile (printMarkdown doc)
 launchPrinter _ _ _ = myError "Error: Output type is not supported"
 
 {- | chooseParser function
@@ -126,3 +127,9 @@ getFileContents path = catch (fmap Just (readFile path)) handler
     where
         handler :: IOException -> IO (Maybe String)
         handler _ = return Nothing
+
+writeFileContents :: String -> String -> IO ()
+writeFileContents outfile content = catch (writeFile outfile content) handler
+    where
+        handler :: IOException -> IO ()
+        handler _ = myError "Error: cannot write to file"
