@@ -11,6 +11,7 @@ module Launcher
 
 import Json (parseJsonValue, printJson, JsonValue(..))
 import XML (parseXMLValue, printXML, XMLValue(..))
+import MarkdownPrinter (printMarkdown)
 import JsonToDocument (jsonToDocument)
 import DocumentToJson (documentToJson)
 import ParserLib (runParser, Parser, (<|>))
@@ -18,7 +19,6 @@ import Config
 import Document
 
 import Control.Exception
-import Debug.Trace
 
 {- | Parsable data type
 
@@ -53,7 +53,7 @@ launchParser conf fileContent = do
     parser <- chooseParser (_iFormat conf)
     case runParser parser fileContent of
         Nothing -> myError "Error: invalid file content"
-        Just val -> trace (show(fst val)) (launchDocument conf (fst val))
+        Just val -> launchDocument conf (fst val)
     return ()
 
 {- | launchDocument function
@@ -73,9 +73,9 @@ launchDocument conf parsable = do
 -}
 launchPrinter :: Config.Format -> String -> Document -> IO ()
 launchPrinter JSON outfile doc = print (printJson (documentToJson doc))
-launchPrinter XML outfile doc = print "XML PRINT IS NOT IMPLEMENTED YET"
-launchPrinter MARKDOWN outfile doc = print "MD PRINT IS NOT IMPLEMENTED YET"
-launchPrinter _ outfile doc = myError "Error: Output type is not supported"
+launchPrinter XML outfile _ = print "XML PRINT IS NOT IMPLEMENTED YET"
+launchPrinter MARKDOWN outfile doc = print (printMarkdown doc)
+launchPrinter _ _ _ = myError "Error: Output type is not supported"
 
 {- | chooseParser function
 
