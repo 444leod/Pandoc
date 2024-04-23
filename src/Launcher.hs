@@ -24,13 +24,13 @@ import Control.Exception
 
     Represents a the Values that can be parsed
     ERRORVALUE is used to represent an error
-    UNKNOWNEDVALUE is for when the format is not known and need to be inferred
+    UNKNOWNVALUE is for when the format is not known and need to be inferred
 -}
 data Parsable =
     JSONVALUE JsonValue |
     XMLVALUE XMLValue |
     ERRORVALUE String |
-    UNKNOWNEDVALUE Parsable deriving (Show)
+    UNKNOWNVALUE Parsable deriving (Show)
 
 {- | launchFile function
 
@@ -65,16 +65,21 @@ launchDocument conf parsable = do
     maybeDoc <- convertToDocument parsable
     case maybeDoc of
         Nothing -> myError "Error: cannot convert to document"
-        Just doc -> launchPrinter (_oFormat conf) (_iFile conf) doc
+        Just doc -> launchPrinter (_oFormat conf) (_oFile conf) doc
 
 {- | launchPrinter function
 
     Print the document based on the format
 -}
 launchPrinter :: Config.Format -> String -> Document -> IO ()
-launchPrinter JSON outfile doc = print (printJson (documentToJson doc))
-launchPrinter XML outfile _ = print "XML PRINT IS NOT IMPLEMENTED YET"
-launchPrinter MARKDOWN outfile doc = print (printMarkdown doc)
+launchPrinter JSON "" doc = print (printJson (documentToJson doc))
+launchPrinter JSON outfile doc =
+    writeFile outfile (printJson (documentToJson doc))
+launchPrinter XML "" _ = print "XML PRINT IS NOT IMPLEMENTED YET"
+launchPrinter XML outfile _ =
+    writeFile outfile "XML PRINT IS NOT IMPLEMENTED YET"
+launchPrinter MARKDOWN "" doc = print (printMarkdown doc)
+launchPrinter MARKDOWN outfile doc = writeFile outfile (printMarkdown doc)
 launchPrinter _ _ _ = myError "Error: Output type is not supported"
 
 {- | chooseParser function
@@ -84,17 +89,17 @@ launchPrinter _ _ _ = myError "Error: Output type is not supported"
 chooseParser :: Config.Format -> IO (Parser Parsable)
 chooseParser JSON = return (JSONVALUE <$> parseJsonValue)
 chooseParser XML = return (XMLVALUE <$> parseXMLValue)
-chooseParser UNKNOWNED = return (UNKNOWNEDVALUE <$> parseUnknowned)
+chooseParser UNKNOWN = return (UNKNOWNVALUE <$> parseUnknown)
 chooseParser _ = myError "Error: Format Not supported"
     >> return (return (ERRORVALUE "This will never get executed"))
 
-{- | parseUnknowned function
+{- | parseUnknown function
 
     Parse the content as a JSON or XML value
     Return a Parsable
 -}
-parseUnknowned :: Parser Parsable
-parseUnknowned =
+parseUnknown :: Parser Parsable
+parseUnknown =
     JSONVALUE <$> parseJsonValue <|>
     XMLVALUE <$> parseXMLValue
 
@@ -106,8 +111,8 @@ parseUnknowned =
 convertToDocument :: Parsable -> IO (Maybe Document)
 convertToDocument (JSONVALUE x) = return (jsonToDocument x)
 convertToDocument (XMLVALUE _) = return Nothing
-convertToDocument (UNKNOWNEDVALUE (JSONVALUE x)) = return (jsonToDocument x)
-convertToDocument (UNKNOWNEDVALUE (XMLVALUE _)) = return Nothing
+convertToDocument (UNKNOWNVALUE (JSONVALUE x)) = return (jsonToDocument x)
+convertToDocument (UNKNOWNVALUE (XMLVALUE _)) = return Nothing
 convertToDocument _ = return Nothing
 
 {- | getFileContents function

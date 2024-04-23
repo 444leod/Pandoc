@@ -20,7 +20,8 @@ import Data.Maybe(fromMaybe)
 import System.Exit(exitWith, ExitCode(ExitFailure))
 import System.IO (hPutStrLn, hPutStr, stderr)
 
-data Format = JSON | XML | MARKDOWN | UNKNOWNED deriving (Enum, Show)
+import Debug.Trace
+data Format = JSON | XML | MARKDOWN | UNKNOWN deriving (Enum, Show)
 
 {-  | Conf data
 
@@ -72,7 +73,7 @@ defaultConf = Conf {
     iFile = Nothing,
     oFormat = Nothing,
     oFile = Nothing,
-    iFormat = Just UNKNOWNED
+    iFormat = Just UNKNOWN
 }
 
 {- | getFormat function
@@ -95,10 +96,12 @@ getFormat _ = Nothing
 -}
 getOpts :: Conf -> [String] -> Maybe Conf
 getOpts conf [] = Just conf
+getOpts conf ("-i":"\"\"":xs) = getOpts conf{iFile = Just "\0"} xs
 getOpts conf ("-i":x:xs) = getOpts conf{iFile = Just x} xs
 getOpts conf ("-f": x:xs) = case getFormat x of
     Nothing -> Nothing
     Just format -> getOpts conf{oFormat = Just format} xs
+getOpts conf ("-o":"":xs) = getOpts conf{oFile = Just "\0"} xs
 getOpts conf ("-o": x:xs) = getOpts conf{oFile = Just x} xs
 getOpts conf ("-e": x:xs) = case getFormat x of
     Nothing -> Nothing
@@ -126,7 +129,7 @@ validateConf _ = return ()
 createVerifiedConf :: Conf -> VerifiedConf
 createVerifiedConf conf = VerifiedConf {
     _iFile = fromMaybe "" (iFile conf),
-    _oFormat = fromMaybe UNKNOWNED (oFormat conf),
+    _oFormat = fromMaybe UNKNOWN (oFormat conf),
     _oFile = fromMaybe "" (oFile conf),
-    _iFormat = fromMaybe UNKNOWNED (iFormat conf)
+    _iFormat = fromMaybe UNKNOWN (iFormat conf)
 }
