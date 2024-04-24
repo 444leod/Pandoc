@@ -56,6 +56,7 @@ contentToJson (CLink link) = linkToJson link
 contentToJson (CList list) = listToJson list
 contentToJson (CCodeBlock codeblock) = codeblockToJson codeblock
 contentToJson (CSection section) = sectionToJson section
+contentToJson (CTextFormat text) = formatToJson text
 
 {- | paragraphContentToJson
     Converts a valid paragraph content to a JsonValue
@@ -108,16 +109,18 @@ listContentToJson (SubList list) = listToJson list
     Converts a valid codeblock to a JsonValue
 -}
 codeblockToJson :: CodeBlock -> JsonValue
-codeblockToJson (CodeBlock paragraphArr) =
+codeblockToJson (CodeBlock codeBlockContent) =
     JObject[("codeblock",
-    JArray (map paragraphToJson paragraphArr))]
+    JArray (map codeBlockContentToJson codeBlockContent))]
 
-{- | paragraphToJson
+{- | codeBlockContentToJson
     Converts a valid paragraph to a JsonValue
 -}
-paragraphToJson :: Paragraph -> JsonValue
-paragraphToJson (Paragraph paragraph) =
+codeBlockContentToJson :: CodeBlockContent -> JsonValue
+codeBlockContentToJson (CodeBlockParagraph(Paragraph paragraph)) =
     JArray (map paragraphContentToJson paragraph)
+codeBlockContentToJson (CodeBlockTextFormat text) =
+    formatToJson text
 
 {- | sectionToJson
     Converts a valid section to a JsonValue

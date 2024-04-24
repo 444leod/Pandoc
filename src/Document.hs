@@ -20,6 +20,7 @@ module Document
     , CodeBlock(..)
     , Format(..)
     , FormatList(..)
+    , CodeBlockContent(..)
 ) where
 
 -- DOCUMENT
@@ -62,7 +63,7 @@ data Content =
     CList List |
     CLink Link |
     CImage Image |
-    CTextFormat FormatList |
+    CTextFormat Format |
     CCodeBlock CodeBlock deriving (Show)
 
 -- DOCUMENT/BODY/CONTENT/SECTION
@@ -120,11 +121,11 @@ newtype List = List [ListContent] deriving (Show)
 {- | Codeblock
     Represents a code block, with a list of paragraph
 -}
-newtype CodeBlock = CodeBlock [Paragraph] deriving (Show)
+newtype CodeBlock = CodeBlock [CodeBlockContent] deriving (Show)
 
 data CodeBlockContent =
     CodeBlockParagraph Paragraph |
-    CodeBlockTextFormat FormatList deriving (Show)
+    CodeBlockTextFormat Format deriving (Show)
 
 -- DOCUMENT/BODY/CONTENT/LIST/LISTCONTENT
 {- | ListContent
