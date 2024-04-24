@@ -12,6 +12,7 @@ module JsonToDocument
 import Document
 import Json
 
+import Debug.Trace
 --- JSON TO DOCUMENT FUNCTIONS ---
 
 {- | jsonToDocument function
@@ -206,6 +207,10 @@ getList (JArray(JObject [("list", obj)]:_)) = do
     val <- getList obj
     return [SubList $ List val]
 getList (JArray []) = Just []
+getList (JArray ( x:xs)) = do
+    res <- getFormatListContent x
+    rest <- getList (JArray xs)
+    return (LTextFormat res : rest)
 getList _ = Nothing
 
 {- | getListContent function

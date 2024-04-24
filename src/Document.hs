@@ -133,6 +133,7 @@ data CodeBlockContent =
 -}
 data ListContent =
     LParagraph Paragraph |
+    LTextFormat Format |
     SubList List deriving (Show)
 
 -- DOCUMENT/BODY/CONTENT/**/FORMAT

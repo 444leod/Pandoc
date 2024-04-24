@@ -103,6 +103,7 @@ listToJson (List list) = JObject[("list", JArray (map listContentToJson list))]
 listContentToJson :: ListContent -> JsonValue
 listContentToJson (LParagraph (Paragraph paragraph)) =
     JArray (map paragraphContentToJson paragraph)
+listContentToJson (LTextFormat text) = formatToJson text
 listContentToJson (SubList list) = listToJson list
 
 {- | codeblockToJson

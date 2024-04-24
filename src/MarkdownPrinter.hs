@@ -156,6 +156,8 @@ printList (List listContent) depth =
 printListContent :: ListContent -> Int -> String
 printListContent (LParagraph (Paragraph paragraph)) depth =
     replicate depth '\t' ++ "- " ++ printParagraph paragraph
+printListContent (LTextFormat text) depth =
+    replicate depth '\t' ++ "- " ++ printTextFormat text ++ "\n"
 printListContent (SubList list) depth = printList list (depth + 1)
 
 {- | printTextFormat
