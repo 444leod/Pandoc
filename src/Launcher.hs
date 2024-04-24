@@ -11,6 +11,7 @@ module Launcher
 
 import Json (parseJsonValue, printJson, JsonValue(..))
 import XML (parseXMLValue, printXML, XMLValue(..))
+import MarkdownPrinter (printMarkdown)
 import JsonToDocument (jsonToDocument)
 import DocumentToJson (documentToJson)
 import ParserLib (runParser, Parser, (<|>))
@@ -18,19 +19,18 @@ import Config
 import Document
 
 import Control.Exception
-import Debug.Trace
 
 {- | Parsable data type
 
     Represents a the Values that can be parsed
     ERRORVALUE is used to represent an error
-    UNKNOWNEDVALUE is for when the format is not known and need to be inferred
+    UNKNOWNVALUE is for when the format is not known and need to be inferred
 -}
 data Parsable =
     JSONVALUE JsonValue |
     XMLVALUE XMLValue |
     ERRORVALUE String |
-    UNKNOWNEDVALUE Parsable deriving (Show)
+    UNKNOWNVALUE Parsable deriving (Show)
 
 {- | launchFile function
 
@@ -53,7 +53,7 @@ launchParser conf fileContent = do
     parser <- chooseParser (_iFormat conf)
     case runParser parser fileContent of
         Nothing -> myError "Error: invalid file content"
-        Just val -> trace (show(fst val)) (launchDocument conf (fst val))
+        Just val -> launchDocument conf (fst val)
     return ()
 
 {- | launchDocument function
@@ -65,36 +65,42 @@ launchDocument conf parsable = do
     maybeDoc <- convertToDocument parsable
     case maybeDoc of
         Nothing -> myError "Error: cannot convert to document"
-        Just doc -> launchPrinter (_oFormat conf) (_iFile conf) doc
+        Just doc -> launchPrinter (_oFormat conf) (_oFile conf) doc
 
 {- | launchPrinter function
 
     Print the document based on the format
 -}
-launchPrinter :: Config.Format -> String -> Document -> IO ()
-launchPrinter JSON outfile doc = print (printJson (documentToJson doc))
-launchPrinter XML outfile doc = print "XML PRINT IS NOT IMPLEMENTED YET"
-launchPrinter MARKDOWN outfile doc = print "MD PRINT IS NOT IMPLEMENTED YET"
-launchPrinter _ outfile doc = myError "Error: Output type is not supported"
+launchPrinter :: ConfFormat -> String -> Document -> IO ()
+launchPrinter JSON "" doc = putStrLn (printJson (documentToJson doc))
+launchPrinter JSON outfile doc =
+    writeFileContents outfile (printJson (documentToJson doc))
+launchPrinter XML "" _ = putStrLn "XML PRINT IS NOT IMPLEMENTED YET"
+launchPrinter XML outfile _ =
+    writeFileContents outfile "XML PRINT IS NOT IMPLEMENTED YET"
+launchPrinter MARKDOWN "" doc = putStrLn (printMarkdown doc)
+launchPrinter MARKDOWN outfile doc =
+    writeFileContents outfile (printMarkdown doc)
+launchPrinter _ _ _ = myError "Error: Output type is not supported"
 
 {- | chooseParser function
 
     Return the parser based on the format
 -}
-chooseParser :: Config.Format -> IO (Parser Parsable)
+chooseParser :: ConfFormat -> IO (Parser Parsable)
 chooseParser JSON = return (JSONVALUE <$> parseJsonValue)
 chooseParser XML = return (XMLVALUE <$> parseXMLValue)
-chooseParser UNKNOWNED = return (UNKNOWNEDVALUE <$> parseUnknowned)
+chooseParser UNKNOWN = return (UNKNOWNVALUE <$> parseUnknown)
 chooseParser _ = myError "Error: Format Not supported"
     >> return (return (ERRORVALUE "This will never get executed"))
 
-{- | parseUnknowned function
+{- | parseUnknown function
 
     Parse the content as a JSON or XML value
     Return a Parsable
 -}
-parseUnknowned :: Parser Parsable
-parseUnknowned =
+parseUnknown :: Parser Parsable
+parseUnknown =
     JSONVALUE <$> parseJsonValue <|>
     XMLVALUE <$> parseXMLValue
 
@@ -106,8 +112,8 @@ parseUnknowned =
 convertToDocument :: Parsable -> IO (Maybe Document)
 convertToDocument (JSONVALUE x) = return (jsonToDocument x)
 convertToDocument (XMLVALUE _) = return Nothing
-convertToDocument (UNKNOWNEDVALUE (JSONVALUE x)) = return (jsonToDocument x)
-convertToDocument (UNKNOWNEDVALUE (XMLVALUE _)) = return Nothing
+convertToDocument (UNKNOWNVALUE (JSONVALUE x)) = return (jsonToDocument x)
+convertToDocument (UNKNOWNVALUE (XMLVALUE _)) = return Nothing
 convertToDocument _ = return Nothing
 
 {- | getFileContents function
@@ -121,3 +127,13 @@ getFileContents path = catch (fmap Just (readFile path)) handler
     where
         handler :: IOException -> IO (Maybe String)
         handler _ = return Nothing
+
+{- | writeFileContents function
+
+    Acts as a wrapper for the writeFile function
+-}
+writeFileContents :: String -> String -> IO ()
+writeFileContents outfile content = catch (writeFile outfile content) handler
+    where
+        handler :: IOException -> IO ()
+        handler _ = myError "Error: cannot write to file"
