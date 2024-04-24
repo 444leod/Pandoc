@@ -10,6 +10,7 @@
 
 module XML
     ( XMLValue(..)
+    , XMLChild(..)
     , parseXMLValue
     , printXML
 ) where
