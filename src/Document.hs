@@ -62,6 +62,7 @@ data Content =
     CList List |
     CLink Link |
     CImage Image |
+    CTextFormat FormatList |
     CCodeBlock CodeBlock deriving (Show)
 
 -- DOCUMENT/BODY/CONTENT/SECTION
@@ -120,6 +121,10 @@ newtype List = List [ListContent] deriving (Show)
     Represents a code block, with a list of paragraph
 -}
 newtype CodeBlock = CodeBlock [Paragraph] deriving (Show)
+
+data CodeBlockContent =
+    CodeBlockParagraph Paragraph |
+    CodeBlockTextFormat FormatList deriving (Show)
 
 -- DOCUMENT/BODY/CONTENT/LIST/LISTCONTENT
 {- | ListContent
