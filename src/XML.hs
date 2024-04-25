@@ -15,7 +15,6 @@ module XML
 ) where
 
 import ParserLib
-import Debug.Trace
 
 {- | XMLValue data type
 
