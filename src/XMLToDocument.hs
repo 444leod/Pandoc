@@ -17,7 +17,7 @@ xmlToDocument :: XMLValue -> Maybe Document
 xmlToDocument (XMLValue _ _ (_:_:_:_)) = Nothing
 xmlToDocument (XMLValue "document" [] childrens) = do
     header <- getHeader (head childrens)
-    body <- getBody (last childrens)
+    body <- trace (show (last childrens)) (getBody (last childrens))
     return $ Document header body
 xmlToDocument _ = Nothing
 
@@ -61,7 +61,36 @@ getContent (XMLText text) = Just $ CTextFormat $ FContent text
 getContent (XMLNode (XMLValue "paragraph" [] childs)) = do
     paragraph <- getParagraph childs
     return $ CParagraph $ Paragraph paragraph
-getContent _ = Nothing
+getContent format = do
+    format' <- trace ("\n\n\n" ++ show format) (getFormat format)
+    return $ CTextFormat format'
+
+getFormat :: XMLChild -> Maybe Format
+getFormat (XMLNode(XMLValue "bold" [] childs)) = getBold childs
+getFormat (XMLNode(XMLValue "italic" [] childs)) = getItalic childs
+getFormat (XMLNode(XMLValue "code" [] childs)) = getCode childs
+getFormat _ = Nothing
+
+getBold :: [XMLChild] -> Maybe Format
+getBold [XMLText text] = Just $ Bold $ FContent text
+getBold [XMLNode(XMLValue "bold" [] childs)] = do
+    res <- getFormat (head childs)
+    return $ Bold res
+getBold _ = Nothing
+
+getItalic :: [XMLChild] -> Maybe Format
+getItalic [XMLText text] = Just $ Italic $ FContent text
+getItalic [XMLNode(XMLValue "italic" [] childs)] = do
+    res <- getFormat (head childs)
+    return $ Italic res
+getItalic _ = Nothing
+
+getCode :: [XMLChild] -> Maybe Format
+getCode [XMLText text] = Just $ Code $ FContent text
+getCode [XMLNode(XMLValue "code" [] childs)] = do
+    res <- getFormat (head childs)
+    return $ Code res
+getCode _ = Nothing
 
 getParagraph :: [XMLChild] -> Maybe [ParagraphContent]
 getParagraph [] = Just []
@@ -72,4 +101,6 @@ getParagraph (x:xs) = do
 
 getParagraphContent :: XMLChild -> Maybe ParagraphContent
 getParagraphContent (XMLText text) = Just $ PTextFormat $ FContent text
-getParagraphContent _ = Nothing
+getParagraphContent format = do
+    format' <- trace ("\n\n\n" ++ show (getFormat format)) (getFormat format)
+    return $ PTextFormat format'
