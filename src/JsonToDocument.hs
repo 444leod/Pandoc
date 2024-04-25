@@ -12,6 +12,7 @@ module JsonToDocument
 import Document
 import Json
 
+import Debug.Trace
 --- JSON TO DOCUMENT FUNCTIONS ---
 
 {- | jsonToDocument function
@@ -84,7 +85,9 @@ getContent (JObject [("image", val)]) = do
 getContent (JObject [("section", val)]) = do
     res <- getSection val
     return $ CSection res
-getContent _ = Nothing
+getContent obj = case getFormatListContent obj of
+    Just res -> return $ CTextFormat res
+    _ -> Nothing
 
 {- | getSection function
     Get a section from a JSON value
@@ -178,12 +181,17 @@ getCode _ = Nothing
     Get a codeblock from a JSON value
     Return a list of Paragraph if the value is a valid codeblock, Nothing otherwise
 -}
-getCodeblock :: JsonValue -> Maybe [Paragraph]
+getCodeblock :: JsonValue -> Maybe [CodeBlockContent]
 getCodeblock (JArray []) = Just []
 getCodeblock (JArray (JArray x:xs)) =  do
     code <- getParagraph x
     rest <- getCodeblock (JArray xs)
-    return $ Paragraph code : rest
+    return $ CodeBlockParagraph (Paragraph code):rest
+getCodeblock (JArray (x:xs)) = case getFormatListContent x of
+    Just res -> do
+        rest <- getCodeblock (JArray xs)
+        return $ CodeBlockTextFormat res:rest
+    _ -> Nothing
 getCodeblock _ = Nothing
 
 {- | getList function
@@ -199,6 +207,10 @@ getList (JArray(JObject [("list", obj)]:_)) = do
     val <- getList obj
     return [SubList $ List val]
 getList (JArray []) = Just []
+getList (JArray ( x:xs)) = do
+    res <- getFormatListContent x
+    rest <- getList (JArray xs)
+    return (LTextFormat res : rest)
 getList _ = Nothing
 
 {- | getListContent function

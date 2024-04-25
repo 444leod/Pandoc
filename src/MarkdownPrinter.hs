@@ -69,6 +69,7 @@ printContent (CList list) _ = printList list 0
 printContent (CLink link) _ = printLink link
 printContent (CImage image) _ = printImage image
 printContent (CCodeBlock codeBlock) _ = printCodeBlock codeBlock
+printContent (CTextFormat text) _ = printTextFormat text ++ "\n"
 
 {- | printSection
 
@@ -131,10 +132,14 @@ printCodeBlock codeBlock =
     code block in markdown format
 -}
 subPrintCodeBlock :: CodeBlock -> String
-subPrintCodeBlock (CodeBlock paragraphs) =
-    concatMap (printParagraph . getParagraphContents) paragraphs
-    where
-        getParagraphContents (Paragraph contents) = contents
+subPrintCodeBlock (CodeBlock paragraphs) = case paragraphs of
+    [] -> ""
+    (x:xs) -> printCodeBlockContent x ++ subPrintCodeBlock (CodeBlock xs)
+
+printCodeBlockContent :: CodeBlockContent -> String
+printCodeBlockContent (CodeBlockParagraph (Paragraph paragraph)) =
+    printParagraph paragraph
+printCodeBlockContent (CodeBlockTextFormat text) = printTextFormat text ++ "\n"
 
 {- | printList
     
@@ -151,6 +156,8 @@ printList (List listContent) depth =
 printListContent :: ListContent -> Int -> String
 printListContent (LParagraph (Paragraph paragraph)) depth =
     replicate depth '\t' ++ "- " ++ printParagraph paragraph
+printListContent (LTextFormat text) depth =
+    replicate depth '\t' ++ "- " ++ printTextFormat text ++ "\n"
 printListContent (SubList list) depth = printList list (depth + 1)
 
 {- | printTextFormat
