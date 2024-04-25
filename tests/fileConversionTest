@@ -16,6 +16,54 @@ def run_pandoc_with_args(args):
 
 class CommandLineArgs(unittest.TestCase):
 
+    def test_simple_json_to_markdown(self):
+        stdout, stderr, returncode = run_pandoc_with_args(['-i', 'tests/testFiles/simpleJsonInput.json', '-f', 'markdown'])
+        with open('tests/testFiles/expectedSimpleMdOutput.md', 'r') as f:
+            expected_output = f.read()
+        self.assertEqual(returncode, 0)
+        self.assertEqual(stderr, '')
+        self.assertEqual(stdout, expected_output)
+
+    def test_simple_json_to_xml(self):
+        stdout, stderr, returncode = run_pandoc_with_args(['-i', 'tests/testFiles/simpleJsonInput.json', '-f', 'xml'])
+        with open('tests/testFiles/expectedSimpleXmlOutput.xml', 'r') as f:
+            expected_output = f.read()
+        self.assertEqual(returncode, 0)
+        self.assertEqual(stderr, '')
+        self.assertEqual(stdout, expected_output)
+
+    def test_simple_markdown_to_json(self):
+        stdout, stderr, returncode = run_pandoc_with_args(['-i', 'tests/testFiles/simpleMdInput.md', '-f', 'json'])
+        with open('tests/testFiles/expectedSimpleJsonOutput.json', 'r') as f:
+            expected_output = f.read()
+        self.assertEqual(returncode, 0)
+        self.assertEqual(stderr, '')
+        self.assertEqual(stdout, expected_output)
+
+    def test_simple_markdown_to_xml(self):
+        stdout, stderr, returncode = run_pandoc_with_args(['-i', 'tests/testFiles/simpleMdInput.md', '-f', 'xml'])
+        with open('tests/testFiles/expectedSimpleXmlOutput.xml', 'r') as f:
+            expected_output = f.read()
+        self.assertEqual(returncode, 0)
+        self.assertEqual(stderr, '')
+        self.assertEqual(stdout, expected_output)
+
+    def test_simple_xml_to_json(self):
+        stdout, stderr, returncode = run_pandoc_with_args(['-i', 'tests/testFiles/simpleXmlInput.xml', '-f', 'json'])
+        with open('tests/testFiles/expectedSimpleJsonOutput.json', 'r') as f:
+            expected_output = f.read()
+        self.assertEqual(returncode, 0)
+        self.assertEqual(stderr, '')
+        self.assertEqual(stdout, expected_output)
+
+    def test_simple_xml_to_markdown(self):
+        stdout, stderr, returncode = run_pandoc_with_args(['-i', 'tests/testFiles/simpleXmlInput.xml', '-f', 'markdown'])
+        with open('tests/testFiles/expectedSimpleMdOutput.md', 'r') as f:
+            expected_output = f.read()
+        self.assertEqual(returncode, 0)
+        self.assertEqual(stderr, '')
+        self.assertEqual(stdout, expected_output)
+
     def test_json_to_markdown(self):
         stdout, stderr, returncode = run_pandoc_with_args(['-i', 'tests/testFiles/rightJSONFile.json', '-f', 'markdown'])
         with open('tests/testFiles/expectedJsonToMdOutput.md', 'r') as f:
