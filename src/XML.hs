@@ -105,6 +105,10 @@ parseChildrens = Parser $ \str -> case str of
         -> Just (XMLNode child:childrens, rest'')
     _ -> runParser subParseChildrens str 
 
+{- | subParseChildrens
+
+    Exist to reduce the complexity of parseChildren
+-}
 subParseChildrens :: Parser [XMLChild]
 subParseChildrens = Parser $ \str -> do
     (text, rest') <- runParser parseText str
