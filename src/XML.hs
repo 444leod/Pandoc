@@ -15,7 +15,7 @@ module XML
 ) where
 
 import ParserLib
-
+import Debug.Trace
 
 {- | XMLValue data type
 
@@ -103,10 +103,15 @@ parseChildrens = Parser $ \str -> case str of
     ('<':_) -> runParser parseXMLValue str >>= \(child, rest')
         -> runParser parseChildrens rest' >>= \(childrens, rest'')
         -> Just (XMLNode child:childrens, rest'')
-    _ -> do
-        (text, rest') <- runParser parseText str
-        (childrens, rest'') <- runParser parseChildrens rest'
-        Just (XMLText text:childrens, rest'')
+    _ -> runParser subParseChildrens str 
+
+subParseChildrens :: Parser [XMLChild]
+subParseChildrens = Parser $ \str -> do
+    (text, rest') <- runParser parseText str
+    (childrens, rest'') <- runParser parseChildrens rest'
+    case text of
+        [] -> Just (childrens, rest'')
+        _ -> Just (XMLText text:childrens, rest'')
 
 {- | parseText function
     
@@ -114,7 +119,9 @@ parseChildrens = Parser $ \str -> case str of
     Return a String or Nothing
 -}
 parseText :: Parser String
-parseText = Parser $ \str -> runParser (parseUntilChars "<") str
+parseText = Parser $ \str -> case runParser removePadding str of
+    Just(_, '<':rest) -> Just ("", '<':rest)
+    _ -> runParser (parseUntilChars "<") str
 
 {-
     Parse the end of a tag
