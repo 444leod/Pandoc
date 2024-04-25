@@ -1,12 +1,12 @@
 {
     "header": {
-        "title": "Syntaxe JSON",
+        "title": "Syntaxe XML",
         "author": "Fornes Leo",
         "date": "2024-01-01"
     },
     "body": [
         [
-            "This document is a simple example of the JSON syntax."
+            "This document is a simple example of the XML syntax."
         ],
         [
             "Every syntax element is displayed in this document."
