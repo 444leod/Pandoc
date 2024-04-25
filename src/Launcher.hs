@@ -18,7 +18,6 @@ import ParserLib (runParser, Parser, (<|>))
 import Config
 import Document
 
-import Debug.Trace
 import Control.Exception
 
 {- | Parsable data type
