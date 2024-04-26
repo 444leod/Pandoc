@@ -4,7 +4,7 @@
     <body>
         <section title="Section Title">
             <codeblock>
-                This is a code block
+                <paragraph>This is a code block</paragraph>
             </codeblock>
         </section>
     </body>
