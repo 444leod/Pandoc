@@ -70,6 +70,9 @@ getContent (XMLNode (XMLValue "list" [] childs)) = do
 getContent (XMLNode (XMLValue "link" [("url", url)] childs)) = do
     res <- getLink childs url
     return $ CLink res
+getContent (XMLNode (XMLValue "image" [("alt", url)] childs)) = do
+    res <- getImage childs url
+    return $ CImage res
 getContent format = do
     format' <- getFormat format
     return $ CTextFormat format'
@@ -113,6 +116,9 @@ getParagraphContent (XMLText text) = Just $ PTextFormat $ FContent text
 getParagraphContent (XMLNode(XMLValue "link" [("url", url)] childs)) = do
     res <- getLink childs url
     return $ PLink res
+getParagraphContent (XMLNode (XMLValue "image" [("alt", url)] childs)) = do
+    res <- getImage childs url
+    return $ PImage res
 getParagraphContent format = do
     format' <- getFormat format
     return $ PTextFormat format'
@@ -123,6 +129,14 @@ getLink node url = do
     Just Link {
         _linkText = FormatList content,
         _linkURL = url
+    }
+
+getImage :: [XMLChild] -> String -> Maybe Image
+getImage node url = do
+    content <- getFormatList node
+    Just Image {
+        _imgText = FormatList content,
+        _imgURL = url
     }
 
 getCodeblock :: [XMLChild] -> Maybe [CodeBlockContent]
@@ -163,3 +177,5 @@ getFormatList (x:xs) = do
 getFormatListContent :: XMLChild -> Maybe Format
 getFormatListContent (XMLText text) = Just $ FContent text
 getFormatListContent format = getFormat format
+
+
