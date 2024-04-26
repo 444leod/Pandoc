@@ -13,6 +13,7 @@ import Json (parseJsonValue, printJson, JsonValue(..))
 import XML (parseXMLValue, printXML, XMLValue(..))
 import MarkdownPrinter (printMarkdown)
 import JsonToDocument (jsonToDocument)
+import XMLToDocument (xmlToDocument)
 import DocumentToJson (documentToJson)
 import DocumentToXML (documentToXML)
 import ParserLib (runParser, Parser, (<|>))
@@ -112,9 +113,9 @@ parseUnknown =
 -}
 convertToDocument :: Parsable -> IO (Maybe Document)
 convertToDocument (JSONVALUE x) = return (jsonToDocument x)
-convertToDocument (XMLVALUE _) = return Nothing
+convertToDocument (XMLVALUE x) = return (xmlToDocument x)
 convertToDocument (UNKNOWNVALUE (JSONVALUE x)) = return (jsonToDocument x)
-convertToDocument (UNKNOWNVALUE (XMLVALUE _)) = return Nothing
+convertToDocument (UNKNOWNVALUE (XMLVALUE x)) = return (xmlToDocument x)
 convertToDocument _ = return Nothing
 
 {- | getFileContents function
