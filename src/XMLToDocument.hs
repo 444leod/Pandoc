@@ -70,7 +70,7 @@ getContent (XMLNode (XMLValue "list" [] childs)) = do
 getContent (XMLNode (XMLValue "link" [("url", url)] childs)) = do
     res <- getLink childs url
     return $ CLink res
-getContent (XMLNode (XMLValue "image" [("alt", url)] childs)) = do
+getContent (XMLNode (XMLValue "image" [("url", url)] childs)) = do
     res <- getImage childs url
     return $ CImage res
 getContent format = do
@@ -116,7 +116,7 @@ getParagraphContent (XMLText text) = Just $ PTextFormat $ FContent text
 getParagraphContent (XMLNode(XMLValue "link" [("url", url)] childs)) = do
     res <- getLink childs url
     return $ PLink res
-getParagraphContent (XMLNode (XMLValue "image" [("alt", url)] childs)) = do
+getParagraphContent (XMLNode (XMLValue "image" [("url", url)] childs)) = do
     res <- getImage childs url
     return $ PImage res
 getParagraphContent format = do
