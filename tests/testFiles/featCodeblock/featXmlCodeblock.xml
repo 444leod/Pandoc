@@ -1,0 +1,11 @@
+<document>
+    <header title="Header Title">
+    </header>
+    <body>
+        <section title="Section Title">
+            <codeblock>
+                This is a code block
+            </codeblock>
+        </section>
+    </body>
+</document>

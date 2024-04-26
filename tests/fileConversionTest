@@ -17,96 +17,144 @@ def run_pandoc_with_args(args):
 class CommandLineArgs(unittest.TestCase):
 
     def test_simple_json_to_markdown(self):
-        stdout, stderr, returncode = run_pandoc_with_args(['-i', 'tests/testFiles/simpleJsonInput.json', '-f', 'markdown'])
-        with open('tests/testFiles/expectedSimpleMdOutput.md', 'r') as f:
+        stdout, stderr, returncode = run_pandoc_with_args(['-i', 'tests/testFiles/simpleFile/simpleJsonInput.json', '-f', 'markdown'])
+        with open('tests/testFiles/simpleFile/expectedSimpleMdOutput.md', 'r') as f:
             expected_output = f.read()
         self.assertEqual(returncode, 0)
         self.assertEqual(stderr, '')
         self.assertEqual(stdout, expected_output)
 
     def test_simple_json_to_xml(self):
-        stdout, stderr, returncode = run_pandoc_with_args(['-i', 'tests/testFiles/simpleJsonInput.json', '-f', 'xml'])
-        with open('tests/testFiles/expectedSimpleXmlOutput.xml', 'r') as f:
+        stdout, stderr, returncode = run_pandoc_with_args(['-i', 'tests/testFiles/simpleFile/simpleJsonInput.json', '-f', 'xml'])
+        with open('tests/testFiles/simpleFile/expectedSimpleXmlOutput.xml', 'r') as f:
             expected_output = f.read()
         self.assertEqual(returncode, 0)
         self.assertEqual(stderr, '')
         self.assertEqual(stdout, expected_output)
 
     def test_simple_markdown_to_json(self):
-        stdout, stderr, returncode = run_pandoc_with_args(['-i', 'tests/testFiles/simpleMdInput.md', '-f', 'json'])
-        with open('tests/testFiles/expectedSimpleJsonOutput.json', 'r') as f:
+        stdout, stderr, returncode = run_pandoc_with_args(['-i', 'tests/testFiles/simpleFile/simpleMdInput.md', '-f', 'json'])
+        with open('tests/testFiles/simpleFile/expectedSimpleJsonOutput.json', 'r') as f:
             expected_output = f.read()
         self.assertEqual(returncode, 0)
         self.assertEqual(stderr, '')
         self.assertEqual(stdout, expected_output)
 
     def test_simple_markdown_to_xml(self):
-        stdout, stderr, returncode = run_pandoc_with_args(['-i', 'tests/testFiles/simpleMdInput.md', '-f', 'xml'])
-        with open('tests/testFiles/expectedSimpleXmlOutput.xml', 'r') as f:
+        stdout, stderr, returncode = run_pandoc_with_args(['-i', 'tests/testFiles/simpleFile/simpleMdInput.md', '-f', 'xml'])
+        with open('tests/testFiles/simpleFile/expectedSimpleXmlOutput.xml', 'r') as f:
             expected_output = f.read()
         self.assertEqual(returncode, 0)
         self.assertEqual(stderr, '')
         self.assertEqual(stdout, expected_output)
 
     def test_simple_xml_to_json(self):
-        stdout, stderr, returncode = run_pandoc_with_args(['-i', 'tests/testFiles/simpleXmlInput.xml', '-f', 'json'])
-        with open('tests/testFiles/expectedSimpleJsonOutput.json', 'r') as f:
+        stdout, stderr, returncode = run_pandoc_with_args(['-i', 'tests/testFiles/simpleFile/simpleXmlInput.xml', '-f', 'json'])
+        with open('tests/testFiles/simpleFile/expectedSimpleJsonOutput.json', 'r') as f:
             expected_output = f.read()
         self.assertEqual(returncode, 0)
         self.assertEqual(stderr, '')
         self.assertEqual(stdout, expected_output)
 
     def test_simple_xml_to_markdown(self):
-        stdout, stderr, returncode = run_pandoc_with_args(['-i', 'tests/testFiles/simpleXmlInput.xml', '-f', 'markdown'])
-        with open('tests/testFiles/expectedSimpleMdOutput.md', 'r') as f:
+        stdout, stderr, returncode = run_pandoc_with_args(['-i', 'tests/testFiles/simpleFile/simpleXmlInput.xml', '-f', 'markdown'])
+        with open('tests/testFiles/simpleFile/expectedSimpleMdOutput.md', 'r') as f:
             expected_output = f.read()
         self.assertEqual(returncode, 0)
         self.assertEqual(stderr, '')
         self.assertEqual(stdout, expected_output)
 
-    def test_json_to_markdown(self):
-        stdout, stderr, returncode = run_pandoc_with_args(['-i', 'tests/testFiles/rightJSONFile.json', '-f', 'markdown'])
-        with open('tests/testFiles/expectedJsonToMdOutput.md', 'r') as f:
+    def test_intermediate_json_to_markdown(self):
+        stdout, stderr, returncode = run_pandoc_with_args(['-i', 'tests/testFiles/intermediateFile/JsonInput.json', '-f', 'markdown'])
+        with open('tests/testFiles/intermediateFile/expectedJsonToMdOutput.md', 'r') as f:
             expected_output = f.read()
         self.assertEqual(returncode, 0)
         self.assertEqual(stderr, '')
         self.assertEqual(stdout, expected_output)
 
-    def test_json_to_xml(self):
-        stdout, stderr, returncode = run_pandoc_with_args(['-i', 'tests/testFiles/rightJSONFile.json', '-f', 'xml'])
-        with open('tests/testFiles/expectedJsonToXmlOutput.xml', 'r') as f:
+    def test_intermediate_json_to_xml(self):
+        stdout, stderr, returncode = run_pandoc_with_args(['-i', 'tests/testFiles/intermediateFile/JsonInput.json', '-f', 'xml'])
+        with open('tests/testFiles/intermediateFile/expectedJsonToXmlOutput.xml', 'r') as f:
             expected_output = f.read()
         self.assertEqual(returncode, 0)
         self.assertEqual(stderr, '')
         self.assertEqual(stdout, expected_output)
 
-    def test_markdown_to_json(self):
-        stdout, stderr, returncode = run_pandoc_with_args(['-i', 'tests/testFiles/rightMDFile.md', '-f', 'json'])
-        with open('tests/testFiles/expectedMdToJsonOutput.json', 'r') as f:
+    def test_intermediate_markdown_to_json(self):
+        stdout, stderr, returncode = run_pandoc_with_args(['-i', 'tests/testFiles/intermediateFile/MdInput.md', '-f', 'json'])
+        with open('tests/testFiles/intermediateFile/expectedMdToJsonOutput.json', 'r') as f:
             expected_output = f.read()
         self.assertEqual(returncode, 0)
         self.assertEqual(stderr, '')
         self.assertEqual(stdout, expected_output)
 
-    def test_markdown_to_xml(self):
-        stdout, stderr, returncode = run_pandoc_with_args(['-i', 'tests/testFiles/rightMDFile.md', '-f', 'xml'])
-        with open('tests/testFiles/expectedMdToXmlOutput.xml', 'r') as f:
+    def test_intermediate_markdown_to_xml(self):
+        stdout, stderr, returncode = run_pandoc_with_args(['-i', 'tests/testFiles/intermediateFile/intermediateFile/MdInput.md', '-f', 'xml'])
+        with open('tests/testFiles/intermediateFile/expectedMdToXmlOutput.xml', 'r') as f:
             expected_output = f.read()
         self.assertEqual(returncode, 0)
         self.assertEqual(stderr, '')
         self.assertEqual(stdout, expected_output)
 
-    def test_xml_to_json(self):
-        stdout, stderr, returncode = run_pandoc_with_args(['-i', 'tests/testFiles/rightXMLFile.xml', '-f', 'json'])
-        with open('tests/testFiles/expectedXmlToJsonOutput.json', 'r') as f:
+    def test_intermediate_xml_to_json(self):
+        stdout, stderr, returncode = run_pandoc_with_args(['-i', 'tests/testFiles/intermediateFile/intermediateFile/XmlInput.xml', '-f', 'json'])
+        with open('tests/testFiles/intermediateFile/expectedXmlToJsonOutput.json', 'r') as f:
             expected_output = f.read()
         self.assertEqual(returncode, 0)
         self.assertEqual(stderr, '')
         self.assertEqual(stdout, expected_output)
 
-    def test_xml_to_markdown(self):
-        stdout, stderr, returncode = run_pandoc_with_args(['-i', 'tests/testFiles/rightXMLFile.xml', '-f', 'markdown'])
-        with open('tests/testFiles/expectedXmlToMdOutput.md', 'r') as f:
+    def test_intermediate_xml_to_markdown(self):
+        stdout, stderr, returncode = run_pandoc_with_args(['-i', 'tests/testFiles/intermediateFile/XmlInput.xml', '-f', 'markdown'])
+        with open('tests/testFiles/intermediateFile/expectedXmlToMdOutput.md', 'r') as f:
+            expected_output = f.read()
+        self.assertEqual(returncode, 0)
+        self.assertEqual(stderr, '')
+        self.assertEqual(stdout, expected_output)
+
+    def test_feat_codeblock_json_to_markdown(self):
+        stdout, stderr, returncode = run_pandoc_with_args(['-i', 'tests/testFiles/featCodeblock/featJsonCodeblock.json', '-f', 'markdown'])
+        with open('tests/testFiles/featCodeblock/featMdCodeblock.md', 'r') as f:
+            expected_output = f.read()
+        self.assertEqual(returncode, 0)
+        self.assertEqual(stderr, '')
+        self.assertEqual(stdout, expected_output)
+
+    def test_feat_codeblock_json_to_xml(self):
+        stdout, stderr, returncode = run_pandoc_with_args(['-i', 'tests/testFiles/featCodeblock/featJsonCodeblock.json', '-f', 'xml'])
+        with open('tests/testFiles/featCodeblock/featXmlCodeblock.xml', 'r') as f:
+            expected_output = f.read()
+        self.assertEqual(returncode, 0)
+        self.assertEqual(stderr, '')
+        self.assertEqual(stdout, expected_output)
+
+    def test_feat_codeblock_markdown_to_json(self):
+        stdout, stderr, returncode = run_pandoc_with_args(['-i', 'tests/testFiles/featCodeblock/featMdCodeblock.md', '-f', 'json'])
+        with open('tests/testFiles/featCodeblock/featJsonCodeblock.json', 'r') as f:
+            expected_output = f.read()
+        self.assertEqual(returncode, 0)
+        self.assertEqual(stderr, '')
+        self.assertEqual(stdout, expected_output)
+
+    def test_feat_codeblock_markdown_to_xml(self):
+        stdout, stderr, returncode = run_pandoc_with_args(['-i', 'tests/testFiles/featCodeblock/featMdCodeblock.md', '-f', 'xml'])
+        with open('tests/testFiles/featCodeblock/featXmlCodeblock.xml', 'r') as f:
+            expected_output = f.read()
+        self.assertEqual(returncode, 0)
+        self.assertEqual(stderr, '')
+        self.assertEqual(stdout, expected_output)
+
+    def test_feat_codeblock_xml_to_json(self):
+        stdout, stderr, returncode = run_pandoc_with_args(['-i', 'tests/testFiles/featCodeblock/featXmlCodeblock.xml', '-f', 'json'])
+        with open('tests/testFiles/featCodeblock/featJsonCodeblock.json', 'r') as f:
+            expected_output = f.read()
+        self.assertEqual(returncode, 0)
+        self.assertEqual(stderr, '')
+        self.assertEqual(stdout, expected_output)
+
+    def test_feat_codeblock_xml_to_markdown(self):
+        stdout, stderr, returncode = run_pandoc_with_args(['-i', 'tests/testFiles/featCodeblock/featXmlCodeblock.xml', '-f', 'markdown'])
+        with open('tests/testFiles/featCodeblock/featMdCodeblock.md', 'r') as f:
             expected_output = f.read()
         self.assertEqual(returncode, 0)
         self.assertEqual(stderr, '')
