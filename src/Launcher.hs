@@ -14,6 +14,7 @@ import XML (parseXMLValue, printXML, XMLValue(..))
 import MarkdownPrinter (printMarkdown)
 import JsonToDocument (jsonToDocument)
 import DocumentToJson (documentToJson)
+import DocumentToXML (documentToXML)
 import ParserLib (runParser, Parser, (<|>))
 import Config
 import Document
@@ -75,9 +76,9 @@ launchPrinter :: ConfFormat -> String -> Document -> IO ()
 launchPrinter JSON "" doc = putStrLn (printJson (documentToJson doc))
 launchPrinter JSON outfile doc =
     writeFileContents outfile (printJson (documentToJson doc))
-launchPrinter XML "" _ = putStrLn "XML PRINT IS NOT IMPLEMENTED YET"
-launchPrinter XML outfile _ =
-    writeFileContents outfile "XML PRINT IS NOT IMPLEMENTED YET"
+launchPrinter XML "" doc = putStrLn (printXML (documentToXML doc))
+launchPrinter XML outfile doc =
+    writeFileContents outfile (printXML (documentToXML doc))
 launchPrinter MARKDOWN "" doc = putStrLn (printMarkdown doc)
 launchPrinter MARKDOWN outfile doc =
     writeFileContents outfile (printMarkdown doc)
