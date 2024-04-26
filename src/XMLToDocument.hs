@@ -17,7 +17,7 @@ xmlToDocument :: XMLValue -> Maybe Document
 xmlToDocument (XMLValue _ _ (_:_:_:_)) = Nothing
 xmlToDocument (XMLValue "document" [] childrens) = do
     header <- getHeader (head childrens)
-    body <- trace (show (last childrens)) (getBody (last childrens))
+    body <- getBody (last childrens)
     return $ Document header body
 xmlToDocument _ = Nothing
 
@@ -61,8 +61,11 @@ getContent (XMLText text) = Just $ CTextFormat $ FContent text
 getContent (XMLNode (XMLValue "paragraph" [] childs)) = do
     paragraph <- getParagraph childs
     return $ CParagraph $ Paragraph paragraph
+getContent (XMLNode (XMLValue "codeblock" [] childs)) = do
+    codeblock <- getCodeblock childs
+    return $ CCodeBlock $ CodeBlock codeblock
 getContent format = do
-    format' <- trace ("\n\n\n" ++ show format) (getFormat format)
+    format' <- getFormat format
     return $ CTextFormat format'
 
 getFormat :: XMLChild -> Maybe Format
@@ -102,5 +105,22 @@ getParagraph (x:xs) = do
 getParagraphContent :: XMLChild -> Maybe ParagraphContent
 getParagraphContent (XMLText text) = Just $ PTextFormat $ FContent text
 getParagraphContent format = do
-    format' <- trace ("\n\n\n" ++ show (getFormat format)) (getFormat format)
+    format' <- getFormat format
     return $ PTextFormat format'
+
+getCodeblock :: [XMLChild] -> Maybe [CodeBlockContent]
+getCodeblock [] = Just []
+getCodeblock ((XMLNode (XMLValue "paragraph" [] childs)):xs) = do
+    code <- getParagraph childs
+    rest <- getCodeblock xs
+    return $  CodeBlockParagraph (Paragraph code):rest
+getCodeblock (x:xs) =
+    case getFormatListContent x of
+        Just res -> do
+            rest <- getCodeblock xs
+            return $ CodeBlockTextFormat res:rest
+        _ -> Nothing
+
+getFormatListContent :: XMLChild -> Maybe Format
+getFormatListContent (XMLText text) = Just $ FContent text
+getFormatListContent format = getFormat format
