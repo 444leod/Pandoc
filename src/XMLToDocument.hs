@@ -64,6 +64,9 @@ getContent (XMLNode (XMLValue "paragraph" [] childs)) = do
 getContent (XMLNode (XMLValue "codeblock" [] childs)) = do
     codeblock <- getCodeblock childs
     return $ CCodeBlock $ CodeBlock codeblock
+getContent (XMLNode (XMLValue "list" [] childs)) = do
+    list <- getList childs
+    return $ CList $ List list
 getContent format = do
     format' <- getFormat format
     return $ CTextFormat format'
@@ -113,13 +116,28 @@ getCodeblock [] = Just []
 getCodeblock ((XMLNode (XMLValue "paragraph" [] childs)):xs) = do
     code <- getParagraph childs
     rest <- getCodeblock xs
-    return $  CodeBlockParagraph (Paragraph code):rest
+    return $ CodeBlockParagraph (Paragraph code):rest
 getCodeblock (x:xs) =
     case getFormatListContent x of
         Just res -> do
             rest <- getCodeblock xs
             return $ CodeBlockTextFormat res:rest
         _ -> Nothing
+
+getList :: [XMLChild] -> Maybe [ListContent]
+getList [] = Just []
+getList ((XMLNode (XMLValue "paragraph" [] childs)):xs) = do
+    content <- getParagraph childs
+    rest <- getList xs
+    return $ LParagraph (Paragraph content):rest
+getList ((XMLNode (XMLValue "list" [] childs)):_) = do
+    val <- getList childs
+    return [SubList $ List val]
+getList (x:xs) = case getFormatListContent x of
+    Just res -> do
+        rest <- getList xs
+        return $ LTextFormat res:rest
+    _ -> Nothing
 
 getFormatListContent :: XMLChild -> Maybe Format
 getFormatListContent (XMLText text) = Just $ FContent text
