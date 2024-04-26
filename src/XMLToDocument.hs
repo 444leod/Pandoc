@@ -73,9 +73,20 @@ getContent (XMLNode (XMLValue "link" [("url", url)] childs)) = do
 getContent (XMLNode (XMLValue "image" [("url", url)] childs)) = do
     res <- getImage childs url
     return $ CImage res
+getContent (XMLNode (XMLValue "section" [("title", title)] childs)) = do
+    res <- getSection childs title
+    return $ CSection res
 getContent format = do
     format' <- getFormat format
     return $ CTextFormat format'
+
+getSection :: [XMLChild] -> String -> Maybe Section
+getSection childs title = do
+    content <- getBodyContent childs
+    Just Section {
+        _sectionTitle = title,
+        _sectionContent = content
+    }
 
 getFormat :: XMLChild -> Maybe Format
 getFormat (XMLNode(XMLValue "bold" [] childs)) = getBold childs
