@@ -168,5 +168,45 @@ class CommandLineArgs(unittest.TestCase):
         self.assertEqual(stderr, '')
         self.assertEqual(stdout, expected_output)
 
+    def test_feat_paragraphs_json_to_xml(self):
+        stdout, stderr, returncode = run_pandoc_with_args(['-i', 'tests/testFiles/featParagraphs/Json.json', '-f', 'xml'])
+        with open('tests/testFiles/featParagraphs/Xml.xml', 'r') as f:
+            expected_output = f.read()
+        self.assertEqual(returncode, 0)
+        self.assertEqual(stderr, '')
+        self.assertEqual(stdout, expected_output)
+
+    def test_feat_paragraphs_markdown_to_json(self):
+        stdout, stderr, returncode = run_pandoc_with_args(['-i', 'tests/testFiles/featParagraphs/Md.md', '-f', 'json'])
+        with open('tests/testFiles/featParagraphs/Json.json', 'r') as f:
+            expected_output = f.read()
+        self.assertEqual(returncode, 0)
+        self.assertEqual(stderr, '')
+        self.assertEqual(stdout, expected_output)
+
+    def test_feat_paragraphs_markdown_to_xml(self):
+        stdout, stderr, returncode = run_pandoc_with_args(['-i', 'tests/testFiles/featParagraphs/Md.md', '-f', 'xml'])
+        with open('tests/testFiles/featParagraphs/Xml.xml', 'r') as f:
+            expected_output = f.read()
+        self.assertEqual(returncode, 0)
+        self.assertEqual(stderr, '')
+        self.assertEqual(stdout, expected_output)
+
+    def test_feat_paragraphs_xml_to_json(self):
+        stdout, stderr, returncode = run_pandoc_with_args(['-i', 'tests/testFiles/featParagraphs/Xml.xml', '-f', 'json'])
+        with open('tests/testFiles/featParagraphs/Json.json', 'r') as f:
+            expected_output = f.read()
+        self.assertEqual(returncode, 0)
+        self.assertEqual(stderr, '')
+        self.assertEqual(stdout, expected_output)
+
+    def test_feat_paragraphs_xml_to_markdown(self):
+        stdout, stderr, returncode = run_pandoc_with_args(['-i', 'tests/testFiles/featParagraphs/Xml.xml', '-f', 'markdown'])
+        with open('tests/testFiles/featParagraphs/Md.md', 'r') as f:
+            expected_output = f.read()
+        self.assertEqual(returncode, 0)
+        self.assertEqual(stderr, '')
+        self.assertEqual(stdout, expected_output)
+
 if __name__ == '__main__':
     unittest.main(verbosity=2)
