@@ -12,7 +12,6 @@ module JsonToDocument
 import Document
 import Json
 
-import Debug.Trace
 --- JSON TO DOCUMENT FUNCTIONS ---
 
 {- | jsonToDocument function
