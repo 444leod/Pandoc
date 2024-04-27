@@ -1,0 +1,34 @@
+/home/elliotalladaye/TEK_2/FUNCTIONNAL/Pandoc/bonus/.stack-work/dist/x86_64-linux/ghc-9.2.5/build/autogen/Paths_mypandoc.hs:
+  hash: c5db51b748e70ec19c10d48c3645e63ea4e49867275180798358f6ea5a60a1d4
+/home/elliotalladaye/TEK_2/FUNCTIONNAL/Pandoc/bonus/CHANGELOG.md:
+  hash: b62ed842988c5298f46ad43a95d19ecab7160e5bff9fb24036a12e307bd8b422
+/home/elliotalladaye/TEK_2/FUNCTIONNAL/Pandoc/bonus/README.md:
+  hash: bac03837118f7cca391f4fde82ef32d7c049e86c80ef8dfbf648f0ef83860135
+/home/elliotalladaye/TEK_2/FUNCTIONNAL/Pandoc/bonus/mypandoc.cabal:
+  hash: 5b5b8b60a06fc84593e551e03864e3dbda86957110f4aa03586bd618187d8e5c
+/home/elliotalladaye/TEK_2/FUNCTIONNAL/Pandoc/bonus/package.yaml:
+  hash: c84db64e8f5b0437c335527c1f98d47b73df523a4ad9ee953d17766b34627605
+/home/elliotalladaye/TEK_2/FUNCTIONNAL/Pandoc/bonus/src/Calculator.hs:
+  hash: a0d6156ee4eaee3f89c4183502589d8ce94b001ea0e07857a59e91e07683a35d
+/home/elliotalladaye/TEK_2/FUNCTIONNAL/Pandoc/bonus/src/Config.hs:
+  hash: 8a90d5d6efc298a5f3dceed53e70393b5dd100e06793eb1172cf314ae61b61a3
+/home/elliotalladaye/TEK_2/FUNCTIONNAL/Pandoc/bonus/src/Document.hs:
+  hash: c8d67c5002c2ae7e1764e7987a1c706243032379e7dec11a721218b1dfff6deb
+/home/elliotalladaye/TEK_2/FUNCTIONNAL/Pandoc/bonus/src/DocumentToJson.hs:
+  hash: 6b439a1f1667b4d4e8f6d0f983e0c445d03d8a437081120265b9ecf74d3037ca
+/home/elliotalladaye/TEK_2/FUNCTIONNAL/Pandoc/bonus/src/DocumentToXML.hs:
+  hash: 84aa8bc7ba7ea60f4bcb30e6665c2f251d9d845fb3c5bc8b5ecfe6d743da3058
+/home/elliotalladaye/TEK_2/FUNCTIONNAL/Pandoc/bonus/src/Json.hs:
+  hash: 44ce31c7656db7b0acdfbf74a8ccc4f591bd5df852f1f0c6a9a35129f7286a42
+/home/elliotalladaye/TEK_2/FUNCTIONNAL/Pandoc/bonus/src/JsonToDocument.hs:
+  hash: a7f542bccd7d5b325b429ad53caf2018368771ac80e9f478cb6c512573d8857d
+/home/elliotalladaye/TEK_2/FUNCTIONNAL/Pandoc/bonus/src/Launcher.hs:
+  hash: c9eaf010954e8863f6df960a074bebf1215f8862ca8bf46a8853fcd05ddc1b8d
+/home/elliotalladaye/TEK_2/FUNCTIONNAL/Pandoc/bonus/src/MarkdownPrinter.hs:
+  hash: 7ce1c9245b4972d0e3a50829d1504a6adc09084367bcd9bedb96f1eeddc3ab42
+/home/elliotalladaye/TEK_2/FUNCTIONNAL/Pandoc/bonus/src/ParserLib.hs:
+  hash: 4feea5da041eed309854ef6272588ab1e51822a7fb101be9b8b38e53b9bb7809
+/home/elliotalladaye/TEK_2/FUNCTIONNAL/Pandoc/bonus/src/XML.hs:
+  hash: 7412034d81449deedfba10fcd20fa84eb038176dbd173e466b8aec0a4a1ac394
+/home/elliotalladaye/TEK_2/FUNCTIONNAL/Pandoc/bonus/src/XMLToDocument.hs:
+  hash: 72191b58a32c4054a60a7c6bb455fbc4e12524fd5c694f831465d6d260633998
