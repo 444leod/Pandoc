@@ -1,5 +1,9 @@
+/home/elliotalladaye/.ghcup/ghc/9.2.5/lib/ghc-9.2.5/include/ghcversion.h:
+  hash: 8ef6e3cecb29aca3884134f57ae55f780b89ff0e4491f9e76cec81b39be34fe6
 /home/elliotalladaye/TEK_2/FUNCTIONNAL/Pandoc/bonus/.stack-work/dist/x86_64-linux/ghc-9.2.5/build/autogen/Paths_mypandoc.hs:
   hash: c5db51b748e70ec19c10d48c3645e63ea4e49867275180798358f6ea5a60a1d4
+/home/elliotalladaye/TEK_2/FUNCTIONNAL/Pandoc/bonus/.stack-work/dist/x86_64-linux/ghc-9.2.5/build/autogen/cabal_macros.h:
+  hash: bef9ce1b52ded9a7c6ffa7b4bdfeee639f7707b74cf9a53c4cd2910c1cb105c1
 /home/elliotalladaye/TEK_2/FUNCTIONNAL/Pandoc/bonus/CHANGELOG.md:
   hash: b62ed842988c5298f46ad43a95d19ecab7160e5bff9fb24036a12e307bd8b422
 /home/elliotalladaye/TEK_2/FUNCTIONNAL/Pandoc/bonus/README.md:
@@ -9,9 +13,9 @@
 /home/elliotalladaye/TEK_2/FUNCTIONNAL/Pandoc/bonus/package.yaml:
   hash: c84db64e8f5b0437c335527c1f98d47b73df523a4ad9ee953d17766b34627605
 /home/elliotalladaye/TEK_2/FUNCTIONNAL/Pandoc/bonus/src/Calculator.hs:
-  hash: a0d6156ee4eaee3f89c4183502589d8ce94b001ea0e07857a59e91e07683a35d
+  hash: 6258f9f24722d17bb6f1d1a4a91e60b8e26e37db0a8fc2722b501ee0c586c311
 /home/elliotalladaye/TEK_2/FUNCTIONNAL/Pandoc/bonus/src/Config.hs:
-  hash: 8a90d5d6efc298a5f3dceed53e70393b5dd100e06793eb1172cf314ae61b61a3
+  hash: 75cbc8fbc3d44f20a1d479a275c24499b8e7881b317f2e84f997b387a2908742
 /home/elliotalladaye/TEK_2/FUNCTIONNAL/Pandoc/bonus/src/Document.hs:
   hash: c8d67c5002c2ae7e1764e7987a1c706243032379e7dec11a721218b1dfff6deb
 /home/elliotalladaye/TEK_2/FUNCTIONNAL/Pandoc/bonus/src/DocumentToJson.hs:
@@ -32,3 +36,5 @@
   hash: 7412034d81449deedfba10fcd20fa84eb038176dbd173e466b8aec0a4a1ac394
 /home/elliotalladaye/TEK_2/FUNCTIONNAL/Pandoc/bonus/src/XMLToDocument.hs:
   hash: 72191b58a32c4054a60a7c6bb455fbc4e12524fd5c694f831465d6d260633998
+/usr/include/stdc-predef.h:
+  hash: cb08cd5d4cc059a90833ac48a284d25016e8d56ded8ad4cd98d8ac59cc5053f3

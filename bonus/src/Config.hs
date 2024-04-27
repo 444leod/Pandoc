@@ -20,7 +20,6 @@ import Data.Maybe(fromMaybe)
 import System.Exit(exitWith, ExitCode(ExitFailure))
 import System.IO (hPutStrLn, hPutStr, stderr)
 
-import Debug.Trace
 data ConfFormat = JSON | XML | MARKDOWN | UNKNOWN deriving (Enum, Show)
 
 {-  | Conf data
@@ -31,7 +30,8 @@ data Conf = Conf {
     iFile :: Maybe String,
     oFormat :: Maybe ConfFormat,
     oFile :: Maybe String,
-    iFormat :: Maybe ConfFormat
+    iFormat :: Maybe ConfFormat,
+    calcMode :: Maybe Bool
 } deriving (Show)
 
 {-  | VerifiedConf data
@@ -42,7 +42,8 @@ data VerifiedConf = VerifiedConf {
     _iFile :: String,
     _oFormat :: ConfFormat,
     _oFile :: String,
-    _iFormat :: ConfFormat
+    _iFormat :: ConfFormat,
+    _calcMode :: Bool
 } deriving (Show)
 
 -- Private functions
@@ -73,7 +74,8 @@ defaultConf = Conf {
     iFile = Nothing,
     oFormat = Nothing,
     oFile = Nothing,
-    iFormat = Just UNKNOWN
+    iFormat = Just UNKNOWN,
+    calcMode = Just False
 }
 
 {- | getFormat function
@@ -98,14 +100,15 @@ getOpts :: Conf -> [String] -> Maybe Conf
 getOpts conf [] = Just conf
 getOpts conf ("-i":"\"\"":xs) = getOpts conf{iFile = Just "\0"} xs
 getOpts conf ("-i":x:xs) = getOpts conf{iFile = Just x} xs
-getOpts conf ("-f": x:xs) = case getFormat x of
+getOpts conf ("-f":x:xs) = case getFormat x of
     Nothing -> Nothing
     Just format -> getOpts conf{oFormat = Just format} xs
 getOpts conf ("-o":"":xs) = getOpts conf{oFile = Just "\0"} xs
-getOpts conf ("-o": x:xs) = getOpts conf{oFile = Just x} xs
-getOpts conf ("-e": x:xs) = case getFormat x of
+getOpts conf ("-o":x:xs) = getOpts conf{oFile = Just x} xs
+getOpts conf ("-e":x:xs) = case getFormat x of
     Nothing -> Nothing
     Just format -> getOpts conf{iFormat = Just format} xs
+getOpts conf ("-c":xs) = getOpts conf{calcMode = Just True} xs
 getOpts _ _ = Nothing
 
 {-  | validateConf function
@@ -116,9 +119,9 @@ getOpts _ _ = Nothing
 -}
 validateConf :: Maybe Conf -> IO ()
 validateConf Nothing = myError "Error:\n\tinvalid arguments.\n"
-validateConf (Just (Conf Nothing _ _ _)) =
+validateConf (Just (Conf Nothing _ _ _ _)) =
     myError "Error:\n\ti is missing."
-validateConf (Just (Conf _ Nothing _ _)) =
+validateConf (Just (Conf _ Nothing _ _ _)) =
     myError "Error:\n\tf is missing."
 validateConf _ = return ()
 
@@ -131,5 +134,6 @@ createVerifiedConf conf = VerifiedConf {
     _iFile = fromMaybe "" (iFile conf),
     _oFormat = fromMaybe UNKNOWN (oFormat conf),
     _oFile = fromMaybe "" (oFile conf),
-    _iFormat = fromMaybe UNKNOWN (iFormat conf)
+    _iFormat = fromMaybe UNKNOWN (iFormat conf),
+    _calcMode = fromMaybe False (calcMode conf)
 }
