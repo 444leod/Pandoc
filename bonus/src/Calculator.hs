@@ -8,13 +8,14 @@
 {-# HLINT ignore "Use lambda-case" #-}
 
 module Calculator(
-    expr, 
+    expr,
     term,
     factor,
     launchCalculator
 ) where
 
 import ParserLib
+import System.IO
 
 expr :: Parser Int
 expr = Parser $ \str -> do
@@ -42,17 +43,27 @@ term = Parser $ \str -> do
         _ -> runParser (removePadding *> factor) str
 
 factor :: Parser Int
-factor = Parser $ \str -> 
+factor = Parser $ \str ->
     case runParser (removePadding *> parseChar '(' *> removePadding
         *> expr <* removePadding <* parseChar ')') str of
         Just (x, rest) -> return (x, rest)
         Nothing -> runParser (removePadding *> parseInt) str
 
 launchCalculator :: IO ()
-launchCalculator = do
-    putStrLn "Enter an expression:"
-    exprToCalc <- getLine
-    case runParser (removePadding *> expr <* removePadding) exprToCalc of
-        Just (result, "") -> putStrLn $ "Result: " ++ show result
-        _ -> putStrLn "Invalid expression"
+launchCalculator =
+    putStrLn "Enter an expression to calculate, type 'exit' to quit" >>
+    calcLoop
 
+calcLoop :: IO ()
+calcLoop = do
+    putStr ">> "
+    hFlush stdout
+    input <- getLine
+    handleInput input
+
+handleInput :: String -> IO ()
+handleInput "exit" = putStrLn "Goodbye"
+handleInput exprToCalc = do
+    case runParser (removePadding *> expr <* removePadding) exprToCalc of
+        Just (result, "") -> print result >> calcLoop
+        _ -> putStrLn "Invalid expression" >> calcLoop
