@@ -31,7 +31,8 @@ data Conf = Conf {
     oFormat :: Maybe ConfFormat,
     oFile :: Maybe String,
     iFormat :: Maybe ConfFormat,
-    calcMode :: Maybe Bool
+    calcMode :: Maybe Bool,
+    csvMode :: Maybe Bool
 } deriving (Show)
 
 {-  | VerifiedConf data
@@ -43,7 +44,8 @@ data VerifiedConf = VerifiedConf {
     _oFormat :: ConfFormat,
     _oFile :: String,
     _iFormat :: ConfFormat,
-    _calcMode :: Bool
+    _calcMode :: Bool,
+    _csvMode :: Bool
 } deriving (Show)
 
 -- Private functions
@@ -53,14 +55,15 @@ data VerifiedConf = VerifiedConf {
     Print an error message and exit the program with a failure code
 -}
 myError :: String -> IO ()
-myError str =
-    hPutStrLn stderr str >>
-    hPutStr stderr "USAGE: ./mypandoc -i ifile -f oformat [-o ofile] " >>
+myError str = hPutStrLn stderr str >>
+    hPutStr stderr "USAGE: ./mypandoc -i ifile -f oformat [-o ofile] [-c]" >>
     hPutStrLn stderr "[-e iformat]" >>
     hPutStrLn stderr "\tifile\t\tpath to the file to convert" >>
     hPutStrLn stderr "\toformat\t\toutput format (xml, json, markdown)" >>
     hPutStrLn stderr "\tofile\t\tpath to the output file" >>
     hPutStrLn stderr "\tiformat\t\tinput format (xml, json, markdown)" >>
+    hPutStrLn stderr "\t-c\t\tto enter calculator mode" >>
+    hPutStrLn stderr "\t-cvs\t\tto enter CSV parser mode" >>
     exitWith (ExitFailure 84)
 
 -- Public functions
@@ -75,7 +78,8 @@ defaultConf = Conf {
     oFormat = Nothing,
     oFile = Nothing,
     iFormat = Just UNKNOWN,
-    calcMode = Just False
+    calcMode = Just False,
+    csvMode = Just False
 }
 
 {- | getFormat function
@@ -109,6 +113,7 @@ getOpts conf ("-e":x:xs) = case getFormat x of
     Nothing -> Nothing
     Just format -> getOpts conf{iFormat = Just format} xs
 getOpts conf ("-c":xs) = getOpts conf{calcMode = Just True} xs
+getOpts conf ("-csv":xs) = getOpts conf{csvMode = Just True} xs
 getOpts _ _ = Nothing
 
 {-  | validateConf function
@@ -119,9 +124,9 @@ getOpts _ _ = Nothing
 -}
 validateConf :: Maybe Conf -> IO ()
 validateConf Nothing = myError "Error:\n\tinvalid arguments.\n"
-validateConf (Just (Conf Nothing _ _ _ _)) =
+validateConf (Just (Conf Nothing _ _ _ _ _)) =
     myError "Error:\n\ti is missing."
-validateConf (Just (Conf _ Nothing _ _ _)) =
+validateConf (Just (Conf _ Nothing _ _ _ _)) =
     myError "Error:\n\tf is missing."
 validateConf _ = return ()
 
@@ -135,5 +140,6 @@ createVerifiedConf conf = VerifiedConf {
     _oFormat = fromMaybe UNKNOWN (oFormat conf),
     _oFile = fromMaybe "" (oFile conf),
     _iFormat = fromMaybe UNKNOWN (iFormat conf),
-    _calcMode = fromMaybe False (calcMode conf)
+    _calcMode = fromMaybe False (calcMode conf),
+    _csvMode = fromMaybe False (csvMode conf)
 }

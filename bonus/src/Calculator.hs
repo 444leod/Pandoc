@@ -15,7 +15,6 @@ module Calculator(
 
 import ParserLib
 import System.IO
-import Debug.Trace
 import Launcher(getFileContents, writeFileContents)
 import Json
 
