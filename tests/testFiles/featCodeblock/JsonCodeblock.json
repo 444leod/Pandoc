@@ -1,0 +1,19 @@
+{
+    "header": {
+        "title": "Header Title"
+    },
+    "body": [
+        {
+            "section": {
+                "title": "Section Title",
+                "content": [
+                    {
+                        "codeblock": [
+                            "This is a code block"
+                        ]
+                    }
+                ]
+            }
+        }
+    ]
+}

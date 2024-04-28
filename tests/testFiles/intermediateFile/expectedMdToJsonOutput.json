@@ -1,12 +1,12 @@
 {
     "header": {
-        "title": "Syntaxe JSON",
+        "title": "Syntaxe MARKDOWN",
         "author": "Fornes Leo",
         "date": "2024-01-01"
     },
     "body": [
         [
-            "This document is a simple example of the JSON syntax."
+            "This document is a simple example of the MARKDOWN syntax."
         ],
         [
             "Every syntax element is displayed in this document."
@@ -39,9 +39,7 @@
                             "content": [
                                 {
                                     "codeblock": [
-                                        [
                                             "This is a code block."
-                                        ]
                                     ]
                                 },
                                 {
@@ -83,7 +81,7 @@
                                 ],
                                 {
                                     "section": {
-                                        "title": "ert",
+                                        "title": "",
                                         "content": [
                                             {
                                                 "section": {
