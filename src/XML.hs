@@ -10,6 +10,7 @@
 
 module XML
     ( XMLValue(..)
+    , XMLChild(..)
     , parseXMLValue
     , printXML
 ) where
@@ -36,7 +37,7 @@ data XMLChild =
     XMLNode XMLValue deriving (Show)
 
 {- | parseXMLValue function
-    
+
     Parse an XML value
     Return an XMLValue or Nothing
 -}

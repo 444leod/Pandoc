@@ -13,7 +13,9 @@ import Json (parseJsonValue, printJson, JsonValue(..))
 import XML (parseXMLValue, printXML, XMLValue(..))
 import MarkdownPrinter (printMarkdown)
 import JsonToDocument (jsonToDocument)
+import XMLToDocument (xmlToDocument)
 import DocumentToJson (documentToJson)
+import DocumentToXML (documentToXML)
 import ParserLib (runParser, Parser, (<|>))
 import Config
 import Document
@@ -78,9 +80,9 @@ launchPrinter :: ConfFormat -> String -> Document -> IO ()
 launchPrinter JSON "" doc = putStrLn (printJson (documentToJson doc))
 launchPrinter JSON outfile doc =
     writeFileContents outfile (printJson (documentToJson doc))
-launchPrinter XML "" _ = putStrLn "XML PRINT IS NOT IMPLEMENTED YET"
-launchPrinter XML outfile _ =
-    writeFileContents outfile "XML PRINT IS NOT IMPLEMENTED YET"
+launchPrinter XML "" doc = putStrLn (printXML (documentToXML doc))
+launchPrinter XML outfile doc =
+    writeFileContents outfile (printXML (documentToXML doc))
 launchPrinter MARKDOWN "" doc = putStrLn (printMarkdown doc)
 launchPrinter MARKDOWN outfile doc =
     writeFileContents outfile (printMarkdown doc)
@@ -115,9 +117,9 @@ parseUnknown =
 convertToDocument :: Parsable -> IO (Maybe Document)
 convertToDocument (JSONVALUE x) = return (jsonToDocument x)
 convertToDocument (MARKDOWNVALUE x) = return (markdownToDocument x)
-convertToDocument (XMLVALUE _) = return Nothing
+convertToDocument (XMLVALUE x) = return (xmlToDocument x)
 convertToDocument (UNKNOWNVALUE (JSONVALUE x)) = return (jsonToDocument x)
-convertToDocument (UNKNOWNVALUE (XMLVALUE _)) = return Nothing
+convertToDocument (UNKNOWNVALUE (XMLVALUE x)) = return (xmlToDocument x)
 convertToDocument _ = return Nothing
 
 {- | getFileContents function
