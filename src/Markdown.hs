@@ -9,24 +9,24 @@
 {-# HLINT ignore "Use lambda-case" #-}
 
 module Markdown (
+    MarkdownValue,
     MarkdownBlock(..),
     MarkdownInline(..),
-    parseMdTitle,
-    parseMdListNode,
-    parseLineIndicator,
-    parseMdHeaderInfo,
-    parseMdParagraph
+    MarkdownFormat(..),
+    parseMarkdownValue,
 ) where
 
 import ParserLib
 
+type MarkdownValue = [MarkdownBlock]
+
 data MarkdownBlock =
-    Paragraph [MarkdownInline] | -- a line of text
-    HeaderInfo String String | -- a line of text
-    ListNode [MarkdownInline] | -- a node of a list
-    Title Int [MarkdownInline] | -- a header (the number is for the importance [1-4])
-    CodeBlock [String] | -- a chunk of code on multiple lines
-    LineIndicator -- an horizontal line
+    MdParagraph [MarkdownInline] | -- a line of text
+    MdHeaderInfo String String | -- a line of text
+    MdListNode [MarkdownInline] | -- a node of a list
+    MdTitle Int [MarkdownInline] | -- a header (the number is for the importance [1-4])
+    MdCodeBlock [String] | -- a chunk of code on multiple lines
+    MdLineIndicator -- an horizontal line
     deriving (Show)
 
 data MarkdownFormat =
@@ -42,6 +42,16 @@ data MarkdownInline =
     Image MarkdownFormat String
     deriving (Show)
 
+parseMarkdownValue :: Parser MarkdownValue
+parseMarkdownValue = Parser $ \str -> do
+    (block, rest1) <- runParser (parseMdHeaderInfo
+        <|> parseMdTitle
+        <|> parseMdParagraph
+        <|> parseLineIndicator
+        <|> parseMdListNode) str
+    (xs, rest2) <- runParser parseMarkdownValue rest1
+    return (block:xs, rest2)
+
 parseLine :: Parser [MarkdownInline]
 parseLine = Parser $ \str -> do
     (result, rest) <- runParser (parseUntilChars "\n") str
@@ -51,7 +61,7 @@ parseLineIndicator :: Parser MarkdownBlock
 parseLineIndicator = Parser $ \str -> do
     (line, rest) <- runParser (parseUntilChars "\n" <* removePadding) str
     case line of
-        "---" -> return (LineIndicator, rest)
+        "---" -> return (MdLineIndicator, rest)
         _ -> Nothing
 
 parseMdHeaderInfo :: Parser MarkdownBlock
@@ -59,7 +69,7 @@ parseMdHeaderInfo = Parser $ \str -> do
     (line, rest) <- runParser (parseUntilChars "\n") str
     (key, value) <- runParser
         (parseUntilChars ":" <* parseChar ':' <* removePadding) line
-    return (HeaderInfo key value, rest)
+    return (MdHeaderInfo key value, rest)
 
 parseMdTitle :: Parser MarkdownBlock
 parseMdTitle = Parser $ \str -> case str of
@@ -73,15 +83,15 @@ parseMdListNode :: Parser MarkdownBlock
 parseMdListNode = Parser $ \str -> case str of
     ('-':' ':xs) -> do
         (inline, rest) <- runParser parseLine xs
-        return (ListNode inline, rest)
+        return (MdListNode inline, rest)
     _ -> Nothing
 
 titleHandler :: Int -> Parser MarkdownBlock
 titleHandler nb = Parser $ \str -> do
     (inline, rest) <- runParser parseLine str
-    return (Title nb inline, rest)
+    return (MdTitle nb inline, rest)
 
 parseMdParagraph :: Parser MarkdownBlock
 parseMdParagraph = Parser $ \str -> do
     (result, rest) <- runParser parseLine str
-    return (Paragraph result, rest)
+    return (MdParagraph result, rest)
