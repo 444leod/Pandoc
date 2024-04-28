@@ -11,7 +11,6 @@ module XMLToDocument
 
 import Document
 import XML
-import Debug.Trace
 
 {- | xmlToDocument function
     Convert a XML value to a Document
