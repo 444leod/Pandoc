@@ -20,6 +20,7 @@ import Document
 
 import Control.Exception
 import Markdown (parseMarkdownValue, MarkdownValue)
+import MarkdownToDocument (markdownToDocument)
 
 {- | Parsable data type
 
@@ -113,6 +114,7 @@ parseUnknown =
 -}
 convertToDocument :: Parsable -> IO (Maybe Document)
 convertToDocument (JSONVALUE x) = return (jsonToDocument x)
+convertToDocument (MARKDOWNVALUE x) = return (markdownToDocument x)
 convertToDocument (XMLVALUE _) = return Nothing
 convertToDocument (UNKNOWNVALUE (JSONVALUE x)) = return (jsonToDocument x)
 convertToDocument (UNKNOWNVALUE (XMLVALUE _)) = return Nothing
