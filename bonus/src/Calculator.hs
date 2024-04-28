@@ -16,54 +16,83 @@ module Calculator(
 
 import ParserLib
 import System.IO
+import Debug.Trace
+import Launcher
+import Json
 
-expr :: Parser Int
-expr = Parser $ \str -> do
-    (x, rest) <- runParser (removePadding *> term <* removePadding) str
+newtype Variables = Variables [(String, Int)]
+
+expr :: Variables -> Parser Int
+expr vars = Parser $ \str -> do
+    (x, rest) <- runParser (removePadding *> term vars <* removePadding) str
     case rest of
         '+':rest' -> do
-            (y, rest'') <- runParser (removePadding *> expr) rest'
+            (y, rest'') <- runParser (removePadding *> expr vars) rest'
             return (x + y, rest'')
-        '-':rest' -> do
-            (y, rest'') <- runParser (removePadding *> expr) rest'
-            return (x - y, rest'')
-        _ -> runParser (removePadding *> term) str
+        _ -> runParser (removePadding *> term vars) str
 
-
-term :: Parser Int
-term = Parser $ \str -> do
-    (x, rest) <- runParser (removePadding *> factor <* removePadding) str
+term :: Variables -> Parser Int
+term vars = Parser $ \str -> do
+    (x, rest) <- runParser (removePadding *> factor vars <* removePadding) str
     case rest of
         '*':rest' -> do
-            (y, rest'') <- runParser (removePadding *> term) rest'
+            (y, rest'') <- runParser (removePadding *> term vars) rest'
             return (x * y, rest'')
-        '/':rest' -> do
-            (y, rest'') <- runParser (removePadding *> term) rest'
-            return (x `div` y, rest'')
-        _ -> runParser (removePadding *> factor) str
+        _ -> runParser (removePadding *> factor vars) str
 
-factor :: Parser Int
-factor = Parser $ \str ->
-    case runParser (removePadding *> parseChar '(' *> removePadding
-        *> expr <* removePadding <* parseChar ')') str of
-        Just (x, rest) -> return (x, rest)
-        Nothing -> runParser (removePadding *> parseInt) str
+factor :: Variables -> Parser Int
+factor vars = Parser $ \str ->
+    runParser (removePadding *> (parseChar '(' *> removePadding *> expr vars
+    <* removePadding <* parseChar ')' <|> parseUInt <|> parseVar vars)) str
+    
+parseVar :: Variables -> Parser Int
+parseVar (Variables vars) = Parser $ \str ->
+    case runParser (removePadding *> parseUntilChars " \n\t+-*/()") str of
+        Just (name, rest) -> case lookup name vars of
+            Just x -> return (x, rest)
+            Nothing -> Nothing
+        Nothing -> Nothing
 
 launchCalculator :: IO ()
 launchCalculator =
-    putStrLn "Enter an expression to calculate, type 'exit' to quit" >>
-    calcLoop
+    putStrLn "Enter an expression to calculate, type 'exit' to quit." >>
+    putStrLn "Only handles UInt, Multiplication and Addition for now..." >>
+    putStrLn "Define new variables using \"var = 'expression'\" notation.\n" >>
+    calcLoop (Variables [])
 
-calcLoop :: IO ()
-calcLoop = do
+calcLoop :: Variables -> IO ()
+calcLoop vars = do
     putStr ">> "
     hFlush stdout
     input <- getLine
-    handleInput input
+    handleInput input vars
 
-handleInput :: String -> IO ()
-handleInput "exit" = putStrLn "Goodbye"
-handleInput exprToCalc = do
-    case runParser (removePadding *> expr <* removePadding) exprToCalc of
-        Just (result, "") -> print result >> calcLoop
-        _ -> putStrLn "Invalid expression" >> calcLoop
+handleInput :: String -> Variables -> IO ()
+handleInput "exit" _ = putStrLn "Goodbye"
+handleInput ('s':'a':'v':'e':' ':xs) vars = case runParser (removePadding *>
+    parseUntilChars " \t" <* removePadding) xs of
+        Just (outfile, "") ->
+            writeFileContents outfile (printJson (varsToJson vars)) >>
+            calcLoop vars
+        _ -> putStrLn "Invalid expression" >> calcLoop vars
+handleInput exprToCalc vars =
+    case runParser (removePadding *> expr vars <* removePadding) exprToCalc of
+        Just (result, "") -> print result >> calcLoop vars
+        _ -> handleNewVar exprToCalc vars
+
+handleNewVar :: String -> Variables -> IO ()
+handleNewVar exprToCalc (Variables vars) = case runParser ((,) <$>
+    (removePadding *> expectNoSeparators "/*-+()" *> parseUntilChars " \n\t=")
+    <*> (removePadding *> parseChar '=' *> removePadding *>
+    expr (Variables vars) <* removePadding)) exprToCalc of
+        Just ((name, result), "") -> calcLoop (Variables ((name, result):vars))
+        _ -> putStrLn "Invalid expression" >> calcLoop (Variables vars)
+
+varsToJson :: Variables -> JsonValue
+varsToJson (Variables vars) =
+    JObject [("Variables", JArray (map varToJson vars))]
+
+varToJson :: (String, Int) -> JsonValue
+varToJson (name, value) =
+    JObject [(name, Number value)]
+

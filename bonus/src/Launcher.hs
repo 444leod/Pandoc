@@ -7,6 +7,7 @@
 
 module Launcher
     ( launchFile
+    , writeFileContents
 ) where
 
 import Json (parseJsonValue, printJson, JsonValue(..))

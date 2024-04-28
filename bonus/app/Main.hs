@@ -17,10 +17,12 @@ main = do
     args <- getArgs
     let conf = defaultConf
     let option = getOpts conf args
+    bonusLauncher option
+
+bonusLauncher :: Maybe Conf -> IO ()
+bonusLauncher (Just (Conf _ _ _ _ (Just True))) = launchCalculator
+bonusLauncher option =
+    validateConf option >>
     case option of
-        Just (Conf _ _ _ _ (Just True)) -> launchCalculator
-        _ -> do
-            validateConf option
-            case option of
-                Just opt -> launchFile (createVerifiedConf opt)
-                Nothing -> myError "Error: invalid arguments"
+        Just opt -> launchFile (createVerifiedConf opt)
+        Nothing -> myError "Error: invalid arguments"
