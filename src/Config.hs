@@ -20,7 +20,6 @@ import Data.Maybe(fromMaybe)
 import System.Exit(exitWith, ExitCode(ExitFailure))
 import System.IO (hPutStrLn, hPutStr, stderr)
 
-import Debug.Trace
 data ConfFormat = JSON | XML | MARKDOWN | UNKNOWN deriving (Enum, Show)
 
 {-  | Conf data

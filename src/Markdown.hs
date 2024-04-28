@@ -16,7 +16,6 @@ module Markdown (
     parseMarkdownValue,
 ) where
 
-import Debug.Trace
 import ParserLib
 
 type MarkdownValue = [MarkdownBlock]
