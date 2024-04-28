@@ -18,8 +18,16 @@ module Markdown (
 
 import ParserLib
 
+{- | MarkdownValue
+    Represents an entire Markdown document as parsed.
+    It is equivalent to a list of `MarkdownBlock`
+-}
 type MarkdownValue = [MarkdownBlock]
 
+{- | MarkdownBlock
+    Any Markdown element that required taking an entire line to exist.
+    For example, a list node (- element) needs to be on a separate line.
+-}
 data MarkdownBlock =
     MdParagraph [MarkdownInline] | -- a line of text
     MdHeaderInfo String String | -- a line of text
@@ -29,6 +37,10 @@ data MarkdownBlock =
     MdLineIndicator -- an horizontal line
     deriving (Show)
 
+{- | MarkdownFormat
+    Represents a chunk of text with modifiers.
+    Uses recursive building so a bold attirbute can hold a italic one f.e.
+-}
 data MarkdownFormat =
     Plain String | -- a word or chunck of words
     Bold MarkdownInline | -- adds a bold attribute to
@@ -36,12 +48,20 @@ data MarkdownFormat =
     Code MarkdownInline
     deriving (Show)
 
+{- | MarkdownInline
+    Any Markdown element that can be stringed in the same line.
+    For exmample, chunks of texts, links, and images, can all be put multiple
+    times on a singular line.
+-}
 data MarkdownInline =
     Text MarkdownFormat |
     Link MarkdownFormat String |
     Image MarkdownFormat String
     deriving (Show)
 
+{- | parseMarkdownValue
+    Parses a list of many markdown blocks from a string.
+-}
 parseMarkdownValue :: Parser MarkdownValue
 parseMarkdownValue = Parser $ \str -> do
     (_, str') <- runParser removePadding str
@@ -49,6 +69,9 @@ parseMarkdownValue = Parser $ \str -> do
         "" -> return ([], "")
         _ -> runParser parseMarkdownBlock str'
 
+{- | parseMarkdownBlock
+    Parses the next block and the tail blocks from a string.
+-}
 parseMarkdownBlock :: Parser MarkdownValue
 parseMarkdownBlock = Parser $ \str -> do
     (block, rest1) <- runParser (parseMdHeaderInfo
@@ -59,11 +82,17 @@ parseMarkdownBlock = Parser $ \str -> do
     (xs, rest2) <- runParser parseMarkdownValue rest1
     return (block:xs, rest2)
 
+{- | parseLine
+    Parses a (the rest of a) line of text from a string.
+-}
 parseLine :: Parser [MarkdownInline]
 parseLine = Parser $ \str -> do
     (result, rest) <- runParser (parseUntilChars "\n") str
     return ([Text $ Plain result], rest)
 
+{- | parseLine
+    Parses a horizontal separation (---) from a string.
+-}
 parseLineIndicator :: Parser MarkdownBlock
 parseLineIndicator = Parser $ \str -> do
     (line, rest) <- runParser (parseUntilChars "\n" <* removePadding) str
@@ -71,6 +100,9 @@ parseLineIndicator = Parser $ \str -> do
         "---" -> return (MdLineIndicator, rest)
         _ -> Nothing
 
+{- | parseMdHeaderInfo
+    Parses a header information (key: value) from a string.
+-}
 parseMdHeaderInfo :: Parser MarkdownBlock
 parseMdHeaderInfo = Parser $ \str -> do
     (line, rest) <- runParser (parseUntilChars "\n") str
@@ -78,6 +110,9 @@ parseMdHeaderInfo = Parser $ \str -> do
         (parseUntilChars ":" <* parseChar ':' <* removePadding) line
     return (MdHeaderInfo key value, rest)
 
+{- | parseMdHeaderInfo
+    Parses a markdown style header title (# Title) from a string.
+-}
 parseMdTitle :: Parser MarkdownBlock
 parseMdTitle = Parser $ \str -> case str of
     ('#':'#':'#':'#':' ':xs) -> runParser (titleHandler 4) xs
@@ -86,6 +121,19 @@ parseMdTitle = Parser $ \str -> case str of
     ('#':' ':xs) -> runParser (titleHandler 1) xs
     _ -> Nothing
 
+{- | titleHandler
+    Creates a MarkdownBlock title from a string.
+    Only used in `parseMdTitle`.
+-}
+titleHandler :: Int -> Parser MarkdownBlock
+titleHandler nb = Parser $ \str -> do
+    (inline, rest) <- runParser parseLine str
+    return (MdTitle nb inline, rest)
+
+
+{- | parseMdHeaderInfo
+    Parses a list element (- element ) from a string.
+-}
 parseMdListNode :: Parser MarkdownBlock
 parseMdListNode = Parser $ \str -> case str of
     ('-':' ':xs) -> do
@@ -93,11 +141,9 @@ parseMdListNode = Parser $ \str -> case str of
         return (MdListNode inline, rest)
     _ -> Nothing
 
-titleHandler :: Int -> Parser MarkdownBlock
-titleHandler nb = Parser $ \str -> do
-    (inline, rest) <- runParser parseLine str
-    return (MdTitle nb inline, rest)
-
+{- | parseMdParagraph
+    Parses a complete line of text as paragraph.
+-}
 parseMdParagraph :: Parser MarkdownBlock
 parseMdParagraph = Parser $ \str -> do
     (result, rest) <- runParser parseLine str
