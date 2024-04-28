@@ -16,6 +16,7 @@ module Markdown (
     parseMarkdownValue,
 ) where
 
+import Debug.Trace
 import ParserLib
 
 type MarkdownValue = [MarkdownBlock]
@@ -44,13 +45,18 @@ data MarkdownInline =
 
 parseMarkdownValue :: Parser MarkdownValue
 parseMarkdownValue = Parser $ \str -> do
-    (block, rest1) <- runParser (parseMdHeaderInfo
-        <|> parseMdTitle
-        <|> parseMdParagraph
-        <|> parseLineIndicator
-        <|> parseMdListNode) str
-    (xs, rest2) <- runParser parseMarkdownValue rest1
-    return (block:xs, rest2)
+    (_, str') <- runParser removePadding str
+    -- trace str' (return 0)
+    case str' of
+        "" -> return ([], "")
+        _ -> do
+            (block, rest1) <- runParser (parseMdHeaderInfo
+                <|> parseLineIndicator
+                <|> parseMdListNode
+                <|> parseMdTitle
+                <|> parseMdParagraph) str'
+            (xs, rest2) <- runParser parseMarkdownValue rest1
+            return (block:xs, rest2)
 
 parseLine :: Parser [MarkdownInline]
 parseLine = Parser $ \str -> do
