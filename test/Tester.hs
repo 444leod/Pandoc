@@ -8,6 +8,7 @@
 import Test.HUnit
 import Text.Printf
 import ConfigSuite (configSuite)
+import JsonSuite (jsonSuite)
 
 main :: IO ()
 main = do
@@ -17,7 +18,7 @@ main = do
 putErrors :: Int -> PutText Int
 putErrors 0 = PutText put 0
     where put _ _ _ = return 0
-putErrors count = PutText put (count)
+putErrors count = PutText put count
     where   put _ _ (-1) = return 0
             put _ False val = return (val - 1)
             put str _ val =
@@ -34,4 +35,4 @@ putCounts (Counts _ tries fails errs) =
     where success = tries - (fails + errs)
 
 testList :: Test
-testList = TestList [configSuite]
+testList = TestList [configSuite, jsonSuite]
