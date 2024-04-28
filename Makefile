@@ -20,7 +20,8 @@ fclean: clean
 
 re: fclean all
 
-tests_run: all
+tests_run:
+	stack build --test
 
 run: all
 

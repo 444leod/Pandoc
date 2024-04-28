@@ -49,11 +49,12 @@ executables:
 
 tests:
   mypandoc-test:
-    main:                Spec.hs
+    main:                Tester.hs
     source-dirs:         test
     ghc-options:
     - -threaded
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
-    - test
+    - mypandoc
+    - HUnit

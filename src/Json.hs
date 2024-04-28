@@ -28,7 +28,7 @@ data JsonValue =
     JString String |
     JArray [JsonValue] |
     JObject [(String, JsonValue)]
-    deriving (Show)
+    deriving (Show, Eq)
 
 {- | parseNull function
     Parse a null value
