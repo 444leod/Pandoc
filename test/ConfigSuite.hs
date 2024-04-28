@@ -10,11 +10,7 @@ module ConfigSuite (
 ) where
 
 import Test.HUnit
-import Config (
-    Format(..),
-    Conf(..),
-    defaultConf,
-    getOpts)
+import Config
 
 getOptsEmptyDefault :: Test
 getOptsEmptyDefault = TestCase $ assertEqual "getOpts []"
@@ -29,7 +25,7 @@ getOptsEmptyCustom = TestCase $ assertEqual "getOpts []"
 getOptsIFile :: Test
 getOptsIFile = TestCase $ assertEqual "getOpts -i file"
     (Just conf) (getOpts defaultConf ["-i", "file"])
-    where conf = Conf (Just "file") Nothing Nothing (Just UNKNOWNED)
+    where conf = Conf (Just "file") Nothing Nothing (Just UNKNOWN)
 
 getOptsIFileEmpty :: Test
 getOptsIFileEmpty = TestCase $ assertEqual "getOpts -i"
@@ -38,7 +34,7 @@ getOptsIFileEmpty = TestCase $ assertEqual "getOpts -i"
 getOptsOFile :: Test
 getOptsOFile = TestCase $ assertEqual "getOpts -o file"
     (Just conf) (getOpts defaultConf ["-o", "file"])
-    where conf = Conf Nothing Nothing (Just "file") (Just UNKNOWNED)
+    where conf = Conf Nothing Nothing (Just "file") (Just UNKNOWN)
 
 getOptsOFileEmpty :: Test
 getOptsOFileEmpty = TestCase $ assertEqual "getOpts -o"
@@ -60,7 +56,7 @@ getOptsIFormatBad = TestCase $ assertEqual "getOpts -f house"
 getOptsOFormat :: Test
 getOptsOFormat = TestCase $ assertEqual "getOpts -f json"
     (Just conf) (getOpts defaultConf ["-f", "json"])
-    where conf = Conf Nothing (Just JSON) Nothing (Just UNKNOWNED)
+    where conf = Conf Nothing (Just JSON) Nothing (Just UNKNOWN)
 
 getOptsOFormatEmpty :: Test
 getOptsOFormatEmpty = TestCase $ assertEqual "getOpts -f"
@@ -73,12 +69,12 @@ getOptsOFormatBad = TestCase $ assertEqual "getOpts -f car"
 getOptsMany1 :: Test
 getOptsMany1 = TestCase $ assertEqual "getOpts -i in -f md -o out"
     (Just c) (getOpts defaultConf ["-i", "in", "-o", "out", "-f", "markdown"])
-    where c = Conf (Just "in") (Just MARKDOWN) (Just "out") (Just UNKNOWNED)
+    where c = Conf (Just "in") (Just MARKDOWN) (Just "out") (Just UNKNOWN)
 
 getOptsMany2 :: Test
 getOptsMany2 = TestCase $ assertEqual "getOpts -i in -i huh -i car"
     conf (getOpts defaultConf ["-i", "in", "-i", "huh", "-i", "car"])
-    where conf = Just (Conf (Just "car") Nothing Nothing (Just UNKNOWNED))
+    where conf = Just (Conf (Just "car") Nothing Nothing (Just UNKNOWN))
 
 getOptsMany3 :: Test
 getOptsMany3 = TestCase $ assertEqual "getOpts -i -e -f -o -i"
