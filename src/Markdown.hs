@@ -45,17 +45,19 @@ data MarkdownInline =
 parseMarkdownValue :: Parser MarkdownValue
 parseMarkdownValue = Parser $ \str -> do
     (_, str') <- runParser removePadding str
-    -- trace str' (return 0)
     case str' of
         "" -> return ([], "")
-        _ -> do
-            (block, rest1) <- runParser (parseMdHeaderInfo
-                <|> parseLineIndicator
-                <|> parseMdListNode
-                <|> parseMdTitle
-                <|> parseMdParagraph) str'
-            (xs, rest2) <- runParser parseMarkdownValue rest1
-            return (block:xs, rest2)
+        _ -> runParser parseMarkdownBlock str'
+
+parseMarkdownBlock :: Parser MarkdownValue
+parseMarkdownBlock = Parser $ \str -> do
+    (block, rest1) <- runParser (parseMdHeaderInfo
+        <|> parseLineIndicator
+        <|> parseMdListNode
+        <|> parseMdTitle
+        <|> parseMdParagraph) str
+    (xs, rest2) <- runParser parseMarkdownValue rest1
+    return (block:xs, rest2)
 
 parseLine :: Parser [MarkdownInline]
 parseLine = Parser $ \str -> do
