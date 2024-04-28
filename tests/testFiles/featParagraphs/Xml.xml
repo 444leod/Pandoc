@@ -1,0 +1,18 @@
+<document>
+    <header>
+        <title>Simple example</title>
+    </header>
+    <body>
+        <paragraph>This is a simple example</paragraph>
+        <paragraph>This is a simple example 2</paragraph>
+        <paragraph>This is a simple example 3</paragraph>
+        <section>
+            <title>Section 1</title>
+            <content>
+                <paragraph>This is a simple example 4</paragraph>
+                <paragraph>This is a simple example 5</paragraph>
+                <paragraph>This is a simple example 6</paragraph>
+            </content>
+        </section>
+    </body>
+</document>
