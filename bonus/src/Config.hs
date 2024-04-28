@@ -20,7 +20,7 @@ import Data.Maybe(fromMaybe)
 import System.Exit(exitWith, ExitCode(ExitFailure))
 import System.IO (hPutStrLn, hPutStr, stderr)
 
-data ConfFormat = JSON | XML | MARKDOWN | UNKNOWN deriving (Enum, Show, Eq)
+data ConfFormat = JSON | XML | MARKDOWN | UNKNOWN deriving (Enum, Show)
 
 {-  | Conf data
 
@@ -30,18 +30,10 @@ data Conf = Conf {
     iFile :: Maybe String,
     oFormat :: Maybe ConfFormat,
     oFile :: Maybe String,
-    iFormat :: Maybe ConfFormat
+    iFormat :: Maybe ConfFormat,
+    calcMode :: Maybe Bool,
+    csvMode :: Maybe Bool
 } deriving (Show)
-
-eqMaybe :: Eq a => Maybe a -> Maybe a -> Bool
-eqMaybe Nothing Nothing = True
-eqMaybe (Just _) Nothing = False
-eqMaybe Nothing (Just _) = False
-eqMaybe (Just x) (Just y) = x == y
-
-instance Eq Conf where
-    (==) (Conf a b c d) (Conf w x y z) =
-        a `eqMaybe` w && b `eqMaybe` x && c `eqMaybe` y && d `eqMaybe` z
 
 {-  | VerifiedConf data
 
@@ -51,7 +43,9 @@ data VerifiedConf = VerifiedConf {
     _iFile :: String,
     _oFormat :: ConfFormat,
     _oFile :: String,
-    _iFormat :: ConfFormat
+    _iFormat :: ConfFormat,
+    _calcMode :: Bool,
+    _csvMode :: Bool
 } deriving (Show)
 
 -- Private functions
@@ -61,14 +55,15 @@ data VerifiedConf = VerifiedConf {
     Print an error message and exit the program with a failure code
 -}
 myError :: String -> IO ()
-myError str =
-    hPutStrLn stderr str >>
-    hPutStr stderr "USAGE: ./mypandoc -i ifile -f oformat [-o ofile] " >>
+myError str = hPutStrLn stderr str >>
+    hPutStr stderr "USAGE: ./mypandoc -i ifile -f oformat [-o ofile] [-c]" >>
     hPutStrLn stderr "[-e iformat]" >>
     hPutStrLn stderr "\tifile\t\tpath to the file to convert" >>
     hPutStrLn stderr "\toformat\t\toutput format (xml, json, markdown)" >>
     hPutStrLn stderr "\tofile\t\tpath to the output file" >>
     hPutStrLn stderr "\tiformat\t\tinput format (xml, json, markdown)" >>
+    hPutStrLn stderr "\t-c\t\tto enter calculator mode" >>
+    hPutStrLn stderr "\t-cvs\t\tto enter CSV parser mode" >>
     exitWith (ExitFailure 84)
 
 -- Public functions
@@ -82,7 +77,9 @@ defaultConf = Conf {
     iFile = Nothing,
     oFormat = Nothing,
     oFile = Nothing,
-    iFormat = Just UNKNOWN
+    iFormat = Just UNKNOWN,
+    calcMode = Just False,
+    csvMode = Just False
 }
 
 {- | getFormat function
@@ -107,14 +104,16 @@ getOpts :: Conf -> [String] -> Maybe Conf
 getOpts conf [] = Just conf
 getOpts conf ("-i":"\"\"":xs) = getOpts conf{iFile = Just "\0"} xs
 getOpts conf ("-i":x:xs) = getOpts conf{iFile = Just x} xs
-getOpts conf ("-f": x:xs) = case getFormat x of
+getOpts conf ("-f":x:xs) = case getFormat x of
     Nothing -> Nothing
     Just format -> getOpts conf{oFormat = Just format} xs
 getOpts conf ("-o":"":xs) = getOpts conf{oFile = Just "\0"} xs
-getOpts conf ("-o": x:xs) = getOpts conf{oFile = Just x} xs
-getOpts conf ("-e": x:xs) = case getFormat x of
+getOpts conf ("-o":x:xs) = getOpts conf{oFile = Just x} xs
+getOpts conf ("-e":x:xs) = case getFormat x of
     Nothing -> Nothing
     Just format -> getOpts conf{iFormat = Just format} xs
+getOpts conf ("-c":xs) = getOpts conf{calcMode = Just True} xs
+getOpts conf ("-csv":xs) = getOpts conf{csvMode = Just True} xs
 getOpts _ _ = Nothing
 
 {-  | validateConf function
@@ -125,9 +124,9 @@ getOpts _ _ = Nothing
 -}
 validateConf :: Maybe Conf -> IO ()
 validateConf Nothing = myError "Error:\n\tinvalid arguments.\n"
-validateConf (Just (Conf Nothing _ _ _)) =
+validateConf (Just (Conf Nothing _ _ _ _ _)) =
     myError "Error:\n\ti is missing."
-validateConf (Just (Conf _ Nothing _ _)) =
+validateConf (Just (Conf _ Nothing _ _ _ _)) =
     myError "Error:\n\tf is missing."
 validateConf _ = return ()
 
@@ -140,5 +139,7 @@ createVerifiedConf conf = VerifiedConf {
     _iFile = fromMaybe "" (iFile conf),
     _oFormat = fromMaybe UNKNOWN (oFormat conf),
     _oFile = fromMaybe "" (oFile conf),
-    _iFormat = fromMaybe UNKNOWN (iFormat conf)
+    _iFormat = fromMaybe UNKNOWN (iFormat conf),
+    _calcMode = fromMaybe False (calcMode conf),
+    _csvMode = fromMaybe False (csvMode conf)
 }
