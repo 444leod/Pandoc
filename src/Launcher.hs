@@ -11,15 +11,16 @@ module Launcher
 
 import Json (parseJsonValue, printJson, JsonValue(..))
 import XML (parseXMLValue, printXML, XMLValue(..))
+import Markdown (parseMarkdownValue, MarkdownValue)
 import MarkdownPrinter (printMarkdown)
 import JsonToDocument (jsonToDocument)
 import XMLToDocument (xmlToDocument)
 import DocumentToJson (documentToJson)
 import DocumentToXML (documentToXML)
+import MarkdownToDocument (markdownToDocument)
 import ParserLib (runParser, Parser, (<|>))
 import Config
 import Document
-
 import Control.Exception
 
 {- | Parsable data type
@@ -31,6 +32,7 @@ import Control.Exception
 data Parsable =
     JSONVALUE JsonValue |
     XMLVALUE XMLValue |
+    MARKDOWNVALUE MarkdownValue |
     ERRORVALUE String |
     UNKNOWNVALUE Parsable deriving (Show)
 
@@ -47,7 +49,7 @@ launchFile conf = do
     return ()
 
 {- | launchParser function
-    
+
     Parse the content based on conf and gives the result to launchDocument
 -}
 launchParser :: VerifiedConf -> String -> IO ()
@@ -60,7 +62,7 @@ launchParser conf fileContent = do
 
 {- | launchDocument function
 
-    Convert the parsable to a document and gives it to launchPrinter 
+    Convert the parsable to a document and gives it to launchPrinter
 -}
 launchDocument :: VerifiedConf -> Parsable -> IO ()
 launchDocument conf parsable = do
@@ -92,9 +94,8 @@ launchPrinter _ _ _ = myError "Error: Output type is not supported"
 chooseParser :: ConfFormat -> IO (Parser Parsable)
 chooseParser JSON = return (JSONVALUE <$> parseJsonValue)
 chooseParser XML = return (XMLVALUE <$> parseXMLValue)
+chooseParser MARKDOWN = return (MARKDOWNVALUE <$> parseMarkdownValue)
 chooseParser UNKNOWN = return (UNKNOWNVALUE <$> parseUnknown)
-chooseParser _ = myError "Error: Format Not supported"
-    >> return (return (ERRORVALUE "This will never get executed"))
 
 {- | parseUnknown function
 
@@ -104,7 +105,8 @@ chooseParser _ = myError "Error: Format Not supported"
 parseUnknown :: Parser Parsable
 parseUnknown =
     JSONVALUE <$> parseJsonValue <|>
-    XMLVALUE <$> parseXMLValue
+    XMLVALUE <$> parseXMLValue <|>
+    MARKDOWNVALUE <$> parseMarkdownValue
 
 {- | convertToDocument function
 
@@ -114,8 +116,11 @@ parseUnknown =
 convertToDocument :: Parsable -> IO (Maybe Document)
 convertToDocument (JSONVALUE x) = return (jsonToDocument x)
 convertToDocument (XMLVALUE x) = return (xmlToDocument x)
+convertToDocument (MARKDOWNVALUE x) = return (markdownToDocument x)
 convertToDocument (UNKNOWNVALUE (JSONVALUE x)) = return (jsonToDocument x)
 convertToDocument (UNKNOWNVALUE (XMLVALUE x)) = return (xmlToDocument x)
+convertToDocument (UNKNOWNVALUE (MARKDOWNVALUE x)) =
+        return (markdownToDocument x)
 convertToDocument _ = return Nothing
 
 {- | getFileContents function
